@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Carnet des savoirs - PACA</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+
+<body>
+  <div id="auth-container" class="auth-container">
+    <!-- Login View -->
+    <div id="login-view" class="glass auth-box">
+      <h2 class="logo" style="text-align: center; margin-bottom: 2rem;">Carnet des savoirs</h2>
+      <h3>Connexion</h3>
+      <form id="login-form">
+        <input type="text" id="login-email" class="quiz-input" placeholder="Email ou Identifiant" required>
+        <input type="password" id="login-password" class="quiz-input" placeholder="Mot de passe" required>
+        <button type="submit" class="quiz-btn" style="width: 100%;">Se connecter</button>
+      </form>
+      <p style="margin-top: 1.5rem; text-align: center; font-size: 0.9rem;">
+        <a href="#" id="to-forgot">Mot de passe oublié ?</a><br>
+        Pas encore de compte ? <a href="#" id="to-register">S'inscrire</a>
+      </p>
+    </div>
+
+    <!-- Register View -->
+    <div id="register-view" class="glass auth-box" style="display: none;">
+      <h2 class="logo" style="text-align: center; margin-bottom: 2rem;">Carnet des savoirs</h2>
+      <h3>Inscription</h3>
+      <form id="register-form">
+        <input type="text" id="register-name" class="quiz-input" placeholder="Nom complet" required>
+        <input type="text" id="register-email" class="quiz-input" placeholder="Email ou Identifiant" required>
+        <input type="password" id="register-password" class="quiz-input" placeholder="Mot de passe" required>
+        <button type="submit" class="quiz-btn" style="width: 100%;">S'inscrire</button>
+      </form>
+      <p style="margin-top: 1.5rem; text-align: center; font-size: 0.9rem;">
+        Déjà un compte ? <a href="#" id="to-login-from-reg">Se connecter</a>
+      </p>
+    </div>
+
+    <!-- Forgot Password View -->
+    <div id="forgot-view" class="glass auth-box" style="display: none;">
+      <h2 class="logo" style="text-align: center; margin-bottom: 2rem;">Carnet des savoirs</h2>
+      <h3>Récupération</h3>
+      <p style="font-size: 0.9rem; color: var(--text-dim); margin-bottom: 1rem;">Entrez votre email pour recevoir un
+        lien de réinitialisation.</p>
+      <form id="forgot-form">
+        <input type="text" id="forgot-email" class="quiz-input" placeholder="Email ou Identifiant" required>
+        <button type="submit" class="quiz-btn" style="width: 100%;">Envoyer le lien</button>
+      </form>
+      <p style="margin-top: 1.5rem; text-align: center; font-size: 0.9rem;">
+        <a href="#" id="to-login-from-forgot">Retour à la connexion</a>
+      </p>
+    </div>
+  </div>
+
+  <div id="app" style="display: none;">
+    <header>
+      <h1 class="logo">Carnet des savoirs</h1>
+      <button id="logout-btn" class="back-btn">Déconnexion</button>
+    </header>
+
+    <!-- Dashboard View -->
+    <main id="dashboard" class="dashboard">
+      <section class="glass quiz-container">
+        <h2>Quiz Régional</h2>
+        <div id="quiz-box" class="quiz-box">
+          <p id="quiz-question" class="quiz-question">Chargement du quiz...</p>
+          <input type="text" id="quiz-input" class="quiz-input" placeholder="Votre réponse...">
+          <button id="quiz-submit" class="quiz-btn">Valider</button>
+          <div id="quiz-feedback" class="feedback"></div>
+        </div>
+
+        <div class="dept-grid-header" style="margin-top: 3rem;">
+          <h2>Départements PACA</h2>
+          <p style="color: var(--text-dim);">Cliquez sur une fiche pour voir les détails</p>
+        </div>
+        <div id="dept-grid" class="dept-grid">
+          <!-- Cards will be injected here -->
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Fiche Detail View -->
+    <div id="fiche-view" class="fiche-view glass" style="padding: 2rem;">
+      <div class="fiche-header">
+        <div>
+          <button id="back-btn" class="back-btn">← Retour</button>
+          <h2 id="fiche-dept-name" style="margin-top: 1rem; font-size: 2.5rem;">Nom du Département</h2>
+          <p id="fiche-dept-pop" style="color: var(--text-dim);"></p>
+        </div>
+        <button id="edit-btn" class="edit-btn">Mode Édition</button>
+      </div>
+
+      <div class="info-grid">
+        <!-- Executif -->
+        <section class="info-section">
+          <h4>Exécutif</h4>
+          <div id="fiche-prefect" class="person-card"></div>
+          <div id="fiche-pres-conseil" class="person-card"></div>
+          <div id="fiche-pres-cdpp" class="person-card"></div>
+        </section>
+
+        <!-- Parlementaires -->
+        <section class="info-section">
+          <h4>Sénateurs</h4>
+          <div id="fiche-senators"></div>
+        </section>
+
+        <section class="info-section">
+          <h4>Députés</h4>
+          <div id="fiche-deputies"></div>
+        </section>
+      </div>
+
+      <div class="info-grid" style="margin-top: 2rem;">
+        <!-- Villes -->
+        <section class="info-section" style="grid-column: span 2;">
+          <h4>Villes (> 20 000 hab.)</h4>
+          <div id="fiche-villes" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;"></div>
+        </section>
+
+        <!-- Postal Data -->
+        <section class="info-section">
+          <h4>Données Postales</h4>
+          <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+            <p>Postiers: <span id="fiche-postiers" class="editable-field" contenteditable="false">Chargement...</span>
+            </p>
+            <p>Points de contact: <span id="fiche-postal-points" class="editable-field" contenteditable="false">0</span>
+            </p>
+            <p>Bureaux: <span id="fiche-postal-bureaux" class="editable-field" contenteditable="false">0</span></p>
+            <p>Établissements courrier: <span id="fiche-postal-courrier" class="editable-field"
+                contenteditable="false">0</span></p>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="./script.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,864 @@
+{
+    "departments": {
+        "04": {
+            "name": "Alpes-de-Haute-Provence",
+            "prefect": {
+                "name": "Isabelle Tomatis",
+                "wiki": "https://fr.wikipedia.org/wiki/Isabelle_Tomatis",
+                "photo": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Isabelle_Tomatis.jpg/220px-Isabelle_Tomatis.jpg"
+            },
+            "president_conseil": {
+                "name": "Éliane Barreille",
+                "wiki": "https://fr.wikipedia.org/wiki/%C3%89liane_Barreille",
+                "photo": "https://www.mondepartement04.fr/images/elus/eliane-barreille.png"
+            },
+            "president_cdpp": {
+                "name": "Sandrine Cosserat",
+                "wiki": "https://fr.wikipedia.org/wiki/Volonne",
+                "photo": "https://colloque2024.popsu.archi.fr/images/participants/cosserat.jpg"
+            },
+            "population": 168054,
+            "postiers": null,
+            "postal_data": {
+                "points_contact": 0,
+                "bureaux": 0,
+                "etablissements_courrier": 0
+            },
+            "senators": [
+                {
+                    "name": "Jean-Yves Roux",
+                    "party": "PRG",
+                    "wiki": "https://fr.wikipedia.org/wiki/Jean-Yves_Roux",
+                    "photo": ""
+                }
+            ],
+            "deputies": [
+                {
+                    "name": "Christian Girard",
+                    "party": "RN",
+                    "circo": 1,
+                    "wiki": "https://fr.wikipedia.org/wiki/Christian_Girard_(homme_politique)",
+                    "photo": ""
+                },
+                {
+                    "name": "Sophie Vaginay",
+                    "party": "UDR",
+                    "circo": 2,
+                    "wiki": "https://fr.wikipedia.org/wiki/Sophie_Vaginay-Ricourt",
+                    "photo": ""
+                }
+            ],
+            "villes_20k": [
+                {
+                    "name": "Manosque",
+                    "pop": 22926,
+                    "mayor": "Camille Galtier",
+                    "party": "LR"
+                }
+            ]
+        },
+        "05": {
+            "name": "Hautes-Alpes",
+            "prefect": {
+                "name": "Philippe Bailbé",
+                "wiki": "https://fr.wikipedia.org/wiki/Philippe_Bailbe",
+                "photo": "https://lyondecideurs.com/wp-content/uploads/sites/17/2025/07/philippe-bailbe-photo-web.png"
+            },
+            "president_conseil": {
+                "name": "Jean-Marie Bernard",
+                "wiki": "https://fr.wikipedia.org/wiki/Jean-Marie_Bernard",
+                "photo": "https://www.hautes-alpes.fr/app/uploads/2023/11/Veynes-Jean-Marie-BERNARD-1-2-250x250.jpg"
+            },
+            "president_cdpp": {
+                "name": "Jean-Michel Arnaud",
+                "wiki": "https://fr.wikipedia.org/wiki/Jean-Michel_Arnaud",
+                "photo": ""
+            },
+            "population": 143467,
+            "postiers": null,
+            "postal_data": {
+                "points_contact": 0,
+                "bureaux": 0,
+                "etablissements_courrier": 0
+            },
+            "senators": [
+                {
+                    "name": "Jean-Michel Arnaud",
+                    "party": "UC",
+                    "wiki": "https://fr.wikipedia.org/wiki/Jean-Michel_Arnaud",
+                    "photo": ""
+                }
+            ],
+            "deputies": [
+                {
+                    "name": "Marie-José Allemand",
+                    "party": "NFP",
+                    "circo": 1,
+                    "wiki": "https://fr.wikipedia.org/wiki/Marie-Jos%C3%A9_Allemand",
+                    "photo": ""
+                },
+                {
+                    "name": "Valérie Rossi",
+                    "party": "NFP",
+                    "circo": 2,
+                    "wiki": "https://fr.wikipedia.org/wiki/Val%C3%A9rie_Rossi",
+                    "photo": ""
+                }
+            ],
+            "villes_20k": [
+                {
+                    "name": "Gap",
+                    "pop": 40500,
+                    "mayor": "Roger Didier",
+                    "party": "DVD"
+                }
+            ]
+        },
+        "06": {
+            "name": "Alpes-Maritimes",
+            "prefect": {
+                "name": "Laurent Hottiaux",
+                "wiki": "https://fr.wikipedia.org/wiki/Laurent_Hottiaux",
+                "photo": "https://www.hauts-de-seine.gouv.fr/var/images/prefecture/prefecture-des-hauts-de-seine/laurent-hottiaux/laurent-hottiaux-prefet-des-hauts-de-seine.jpg"
+            },
+            "president_conseil": {
+                "name": "Charles-Ange Ginésy",
+                "wiki": "https://fr.wikipedia.org/wiki/Charles-Ange_Gin%C3%A9sy",
+                "photo": "https://upload.wikimedia.org/wikipedia/commons/4/4b/Charles_Ange_GINESY.jpg"
+            },
+            "president_cdpp": {
+                "name": "Bertrand Gasiglia",
+                "wiki": "https://fr.wikipedia.org/wiki/Tourrette-Levens",
+                "photo": "https://univ-cotedazur.fr/medias/photo/bertrand-gasiglia_1603708465697-jpg"
+            },
+            "population": 1103941,
+            "postiers": null,
+            "postal_data": {
+                "points_contact": 0,
+                "bureaux": 0,
+                "etablissements_courrier": 0
+            },
+            "senators": [
+                {
+                    "name": "Alexandra Borchio-Fontimp",
+                    "party": "LR",
+                    "wiki": "https://fr.wikipedia.org/wiki/Alexandra_Borchio-Fontimp",
+                    "photo": ""
+                },
+                {
+                    "name": "Patricia Demas",
+                    "party": "LR",
+                    "wiki": "https://fr.wikipedia.org/wiki/Patricia_Demas",
+                    "photo": ""
+                },
+                {
+                    "name": "Dominique Estrosi Sassone",
+                    "party": "LR",
+                    "wiki": "https://fr.wikipedia.org/wiki/Dominique_Estrosi_Sassone",
+                    "photo": ""
+                },
+                {
+                    "name": "Henri Leroy",
+                    "party": "LR",
+                    "wiki": "https://fr.wikipedia.org/wiki/Henri_Leroy",
+                    "photo": ""
+                },
+                {
+                    "name": "Philippe Tabarot",
+                    "party": "LR",
+                    "wiki": "https://fr.wikipedia.org/wiki/Philippe_Tabarot",
+                    "photo": ""
+                }
+            ],
+            "deputies": [
+                {
+                    "name": "Éric Ciotti",
+                    "party": "UDR",
+                    "circo": 1,
+                    "wiki": "https://fr.wikipedia.org/wiki/%C3%89ric_Ciotti",
+                    "photo": ""
+                },
+                {
+                    "name": "Lionel Tivoli",
+                    "party": "RN",
+                    "circo": 2,
+                    "wiki": "https://fr.wikipedia.org/wiki/Lionel_Tivoli",
+                    "photo": ""
+                },
+                {
+                    "name": "Bernard Chaix",
+                    "party": "UDR",
+                    "circo": 3,
+                    "wiki": "https://fr.wikipedia.org/wiki/Bernard_Chaix",
+                    "photo": ""
+                },
+                {
+                    "name": "Alexandra Masson",
+                    "party": "RN",
+                    "circo": 4,
+                    "wiki": "https://fr.wikipedia.org/wiki/Alexandra_Masson",
+                    "photo": ""
+                },
+                {
+                    "name": "Christelle D'Intorni",
+                    "party": "UDR",
+                    "circo": 5,
+                    "wiki": "https://fr.wikipedia.org/wiki/Christelle_D%27Intorni",
+                    "photo": ""
+                },
+                {
+                    "name": "Bryan Masson",
+                    "party": "RN",
+                    "circo": 6,
+                    "wiki": "https://fr.wikipedia.org/wiki/Bryan_Masson",
+                    "photo": ""
+                },
+                {
+                    "name": "Éric Pauget",
+                    "party": "LR",
+                    "circo": 7,
+                    "wiki": "https://fr.wikipedia.org/wiki/%C3%89ric_Pauget",
+                    "photo": ""
+                },
+                {
+                    "name": "Alexandra Martin",
+                    "party": "LR",
+                    "circo": 8,
+                    "wiki": "https://fr.wikipedia.org/wiki/Alexandra_Martin_(femme_politique,_1968)",
+                    "photo": ""
+                },
+                {
+                    "name": "Michèle Tabarot",
+                    "party": "LR",
+                    "circo": 9,
+                    "wiki": "https://fr.wikipedia.org/wiki/Mich%C3%A8le_Tabarot",
+                    "photo": ""
+                }
+            ],
+            "villes_20k": [
+                {
+                    "name": "Nice",
+                    "pop": 348085,
+                    "mayor": "Christian Estrosi",
+                    "party": "HOR",
+                    "photo": "https://upload.wikimedia.org/wikipedia/commons/d/d4/Christian_Estrosi_-_2017_%2824778920307%29_%28cropped%29.jpg"
+                },
+                {
+                    "name": "Antibes",
+                    "pop": 75130,
+                    "mayor": "Jean Leonetti",
+                    "party": "LR"
+                },
+                {
+                    "name": "Cannes",
+                    "pop": 73868,
+                    "mayor": "David Lisnard",
+                    "party": "LR"
+                },
+                {
+                    "name": "Cagnes-sur-Mer",
+                    "pop": 52580,
+                    "mayor": "Louis Nègre",
+                    "party": "LR"
+                },
+                {
+                    "name": "Grasse",
+                    "pop": 48323,
+                    "mayor": "Jérôme Viaud",
+                    "party": "LR"
+                },
+                {
+                    "name": "Le Cannet",
+                    "pop": 41597,
+                    "mayor": "Yves Pigrenet",
+                    "party": "LR"
+                },
+                {
+                    "name": "Vallauris",
+                    "pop": 27024,
+                    "mayor": "Kevin Luciano",
+                    "party": "DVD"
+                },
+                {
+                    "name": "Saint-Laurent-du-Var",
+                    "pop": 29169,
+                    "mayor": "Joseph Segura",
+                    "party": "DVD"
+                },
+                {
+                    "name": "Menton",
+                    "pop": 30412,
+                    "mayor": "Yves Juhel",
+                    "party": "DVD"
+                },
+                {
+                    "name": "Mandelieu-la-Napoule",
+                    "pop": 21561,
+                    "mayor": "Sébastien Leroy",
+                    "party": "LR"
+                }
+            ]
+        },
+        "13": {
+            "name": "Bouches-du-Rhône",
+            "prefect": {
+                "name": "Jacques Witkowski",
+                "wiki": "https://fr.wikipedia.org/wiki/Jacques_Witkowski",
+                "photo": "https://www.bouches-du-rhone.gouv.fr/var/ezflow_site/storage/images/actualites/prise-de-fonction-de-jacques-witkowski-nouveau-prefet-des-bouches-du-rhone/73039-1-fre-FR/Prise-de-fonction-de-Jacques-Witkowski-nouveau-prefet-des-Bouches-du-Rhone_medium.jpg"
+            },
+            "president_conseil": {
+                "name": "Martine Vassal",
+                "wiki": "https://fr.wikipedia.org/wiki/Martine_Vassal",
+                "photo": "https://upload.wikimedia.org/wikipedia/commons/c/c5/Martine_Vassal_UDG.jpg"
+            },
+            "president_cdpp": {
+                "name": "Jean-Christophe Carré",
+                "wiki": "https://fr.wikipedia.org/wiki/Maussane-les-Alpilles",
+                "photo": "https://www.mairie-maussane.fr/wp-content/uploads/2020/07/Jean-Christophe-CARRE.jpg"
+            },
+            "population": 2043110,
+            "postiers": null,
+            "postal_data": {
+                "points_contact": 0,
+                "bureaux": 0,
+                "etablissements_courrier": 0
+            },
+            "senators": [
+                {
+                    "name": "Jérémy Bacchi",
+                    "party": "PCF",
+                    "wiki": "https://fr.wikipedia.org/wiki/J%C3%A9r%C3%A9my_Bacchi",
+                    "photo": ""
+                },
+                {
+                    "name": "Guy Benarroche",
+                    "party": "EELV",
+                    "wiki": "https://fr.wikipedia.org/wiki/Guy_Benarroche",
+                    "photo": ""
+                },
+                {
+                    "name": "Valérie Boyer",
+                    "party": "LR",
+                    "wiki": "https://fr.wikipedia.org/wiki/Val%C3%A9rie_Boyer",
+                    "photo": ""
+                },
+                {
+                    "name": "Marie-Arlette Carlotti",
+                    "party": "PS",
+                    "wiki": "https://fr.wikipedia.org/wiki/Marie-Arlette_Carlotti",
+                    "photo": ""
+                },
+                {
+                    "name": "Brigitte Devésa",
+                    "party": "UDI",
+                    "wiki": "https://fr.wikipedia.org/wiki/Brigitte_Dev%C3%A9sa",
+                    "photo": ""
+                },
+                {
+                    "name": "Mireille Jouve",
+                    "party": "DVG",
+                    "wiki": "https://fr.wikipedia.org/wiki/Mireille_Jouve",
+                    "photo": ""
+                },
+                {
+                    "name": "Stéphane Le Rudulier",
+                    "party": "LR",
+                    "wiki": "https://fr.wikipedia.org/wiki/St%C3%A9phane_Le_Rudulier",
+                    "photo": ""
+                },
+                {
+                    "name": "Stéphane Ravier",
+                    "party": "REC",
+                    "wiki": "https://fr.wikipedia.org/wiki/St%C3%A9phane_Ravier",
+                    "photo": ""
+                }
+            ],
+            "deputies": [
+                {
+                    "name": "Monique Griseti",
+                    "party": "RN",
+                    "circo": 1,
+                    "wiki": "https://fr.wikipedia.org/wiki/Monique_Griseti",
+                    "photo": ""
+                },
+                {
+                    "name": "Laurent Lhardit",
+                    "party": "PS",
+                    "circo": 2,
+                    "wiki": "https://fr.wikipedia.org/wiki/Laurent_Lhardit",
+                    "photo": ""
+                },
+                {
+                    "name": "Gisèle Lelouis",
+                    "party": "RN",
+                    "circo": 3,
+                    "wiki": "https://fr.wikipedia.org/wiki/Gis%C3%A8le_Lelouis",
+                    "photo": ""
+                },
+                {
+                    "name": "Manuel Bompard",
+                    "party": "LFI",
+                    "circo": 4,
+                    "wiki": "https://fr.wikipedia.org/wiki/Manuel_Bompard",
+                    "photo": ""
+                },
+                {
+                    "name": "Hendrik Davi",
+                    "party": "LFI",
+                    "circo": 5,
+                    "wiki": "https://fr.wikipedia.org/wiki/Hendrik_Davi",
+                    "photo": ""
+                },
+                {
+                    "name": "Olivier Fayssat",
+                    "party": "UDR",
+                    "circo": 6,
+                    "wiki": "https://fr.wikipedia.org/wiki/Olivier_Fayssat",
+                    "photo": ""
+                },
+                {
+                    "name": "Sébastien Delogu",
+                    "party": "LFI",
+                    "circo": 7,
+                    "wiki": "https://fr.wikipedia.org/wiki/S%C3%A9bastien_Delogu",
+                    "photo": ""
+                },
+                {
+                    "name": "Romain Tonussi",
+                    "party": "RN",
+                    "circo": 8,
+                    "wiki": "https://fr.wikipedia.org/wiki/Romain_Tonussi",
+                    "photo": ""
+                },
+                {
+                    "name": "Joëlle Mélin",
+                    "party": "RN",
+                    "circo": 9,
+                    "wiki": "https://fr.wikipedia.org/wiki/Jo%C3%ABlle_M%C3%A9lin",
+                    "photo": ""
+                },
+                {
+                    "name": "José Gonzalez",
+                    "party": "RN",
+                    "circo": 10,
+                    "wiki": "https://fr.wikipedia.org/wiki/Jos%C3%A9_Gonzalez_(homme_politique)",
+                    "photo": ""
+                },
+                {
+                    "name": "Marc Pena",
+                    "party": "DVG",
+                    "circo": 11,
+                    "wiki": "https://fr.wikipedia.org/wiki/Marc_Pena",
+                    "photo": ""
+                },
+                {
+                    "name": "Franck Allisio",
+                    "party": "RN",
+                    "circo": 12,
+                    "wiki": "https://fr.wikipedia.org/wiki/Franck_Allisio",
+                    "photo": ""
+                },
+                {
+                    "name": "Emmanuel Fouquart",
+                    "party": "RN",
+                    "circo": 13,
+                    "wiki": "https://fr.wikipedia.org/wiki/Emmanuel_Fouquart",
+                    "photo": ""
+                },
+                {
+                    "name": "Gérault Verny",
+                    "party": "UDR",
+                    "circo": 14,
+                    "wiki": "https://fr.wikipedia.org/wiki/G%C3%A9rault_Verny",
+                    "photo": ""
+                },
+                {
+                    "name": "Romain Baubry",
+                    "party": "RN",
+                    "circo": 15,
+                    "wiki": "https://fr.wikipedia.org/wiki/Romain_Baubry",
+                    "photo": ""
+                },
+                {
+                    "name": "Emmanuel Taché de la Pagerie",
+                    "party": "RN",
+                    "circo": 16,
+                    "wiki": "https://fr.wikipedia.org/wiki/Emmanuel_Tach%C3%A9_de_la_Pagerie",
+                    "photo": ""
+                }
+            ],
+            "villes_20k": [
+                {
+                    "name": "Marseille",
+                    "pop": 870715,
+                    "mayor": "Benoît Payan",
+                    "party": "DVG",
+                    "photo": "https://upload.wikimedia.org/wikipedia/commons/f/fe/Beno%C3%AEt_Payan.jpg"
+                },
+                {
+                    "name": "Aix-en-Provence",
+                    "pop": 147478,
+                    "mayor": "Sophie Joissains",
+                    "party": "UDI"
+                },
+                {
+                    "name": "Arles",
+                    "pop": 50454,
+                    "mayor": "Patrick de Carolis",
+                    "party": "DVD"
+                },
+                {
+                    "name": "Martigues",
+                    "pop": 48506,
+                    "mayor": "Gaby Charroux",
+                    "party": "PCF"
+                },
+                {
+                    "name": "Aubagne",
+                    "pop": 47342,
+                    "mayor": "Gérard Gazay",
+                    "party": "LR"
+                },
+                {
+                    "name": "Salon-de-Provence",
+                    "pop": 45004,
+                    "mayor": "Nicolas Isnard",
+                    "party": "LR"
+                },
+                {
+                    "name": "Istres",
+                    "pop": 44577,
+                    "mayor": "François Bernardini",
+                    "party": "DVG"
+                },
+                {
+                    "name": "La Ciotat",
+                    "pop": 36987,
+                    "mayor": "Alexandre Doriol",
+                    "party": "LR"
+                },
+                {
+                    "name": "Vitrolles",
+                    "pop": 35532,
+                    "mayor": "Loïc Gachon",
+                    "party": "PS"
+                },
+                {
+                    "name": "Marignane",
+                    "pop": 33003,
+                    "mayor": "Eric Le Dissès",
+                    "party": "DVD"
+                },
+                {
+                    "name": "Miramas",
+                    "pop": 26405,
+                    "mayor": "Frédéric Vigouroux",
+                    "party": "PS"
+                },
+                {
+                    "name": "Les Pennes-Mirabeau",
+                    "pop": 22169,
+                    "mayor": "Michel Amiel",
+                    "party": "DVG"
+                },
+                {
+                    "name": "Gardanne",
+                    "pop": 21174,
+                    "mayor": "Hervé Granier",
+                    "party": "LR"
+                },
+                {
+                    "name": "Allauch",
+                    "pop": 21490,
+                    "mayor": "Lionel de Cala",
+                    "party": "LR"
+                }
+            ]
+        },
+        "83": {
+            "name": "Var",
+            "prefect": {
+                "name": "Simon Babre",
+                "wiki": "https://fr.wikipedia.org/wiki/Simon_Babre",
+                "photo": "https://www.var.gouv.fr/var/ezflow_site/storage/images/actions-de-l-etat/prefecture-et-sous-prefectures/prefecture-toulon/les-membres-du-corps-prefectoral/simon-babre-prefet-du-var/72236-1-fre-FR/Simon-BABRE-prefet-du-Var_medium.jpg"
+            },
+            "president_conseil": {
+                "name": "Jean-Louis Masson",
+                "wiki": "https://fr.wikipedia.org/wiki/Jean-Louis_Masson_(homme_politique,_1954)",
+                "photo": ""
+            },
+            "president_cdpp": {
+                "name": "Jean-Pierre Veran",
+                "wiki": "https://fr.wikipedia.org/wiki/Cotignac",
+                "photo": "https://media.gettyimages.com/id/187213898/fr/photo/jean-pierre-veran-maire-de-cotignac-dans-le-sud-de-la-france-participe-a-un-debat-le-21-novembre.jpg?s=612x612&w=gi&k=20&c=6X_3d3wJ_q_e_1x0Y_w_0x0x0x0x0x0"
+            },
+            "population": 1085189,
+            "postiers": null,
+            "postal_data": {
+                "points_contact": 0,
+                "bureaux": 0,
+                "etablissements_courrier": 0
+            },
+            "senators": [
+                {
+                    "name": "Jean Bacci",
+                    "party": "LR",
+                    "wiki": "https://fr.wikipedia.org/wiki/Jean_Bacci",
+                    "photo": ""
+                },
+                {
+                    "name": "Michel Bonnus",
+                    "party": "LR",
+                    "wiki": "https://fr.wikipedia.org/wiki/Michel_Bonnus",
+                    "photo": ""
+                },
+                {
+                    "name": "Françoise Dumont",
+                    "party": "LR",
+                    "wiki": "https://fr.wikipedia.org/wiki/Fran%C3%A7oise_Dumont_(femme_politique)",
+                    "photo": ""
+                },
+                {
+                    "name": "André Guiol",
+                    "party": "RDSE",
+                    "wiki": "https://fr.wikipedia.org/wiki/Andr%C3%A9_Guiol",
+                    "photo": ""
+                }
+            ],
+            "deputies": [
+                {
+                    "name": "Yannick Chenevard",
+                    "party": "RE",
+                    "circo": 1,
+                    "wiki": "https://fr.wikipedia.org/wiki/Yannick_Chenevard",
+                    "photo": ""
+                },
+                {
+                    "name": "Laure Lavalette",
+                    "party": "RN",
+                    "circo": 2,
+                    "wiki": "https://fr.wikipedia.org/wiki/Laure_Lavalette",
+                    "photo": ""
+                },
+                {
+                    "name": "Stéphane Rambaud",
+                    "party": "RN",
+                    "circo": 3,
+                    "wiki": "https://fr.wikipedia.org/wiki/St%C3%A9phane_Rambaud",
+                    "photo": ""
+                },
+                {
+                    "name": "Philippe Lottiaux",
+                    "party": "RN",
+                    "circo": 4,
+                    "wiki": "https://fr.wikipedia.org/wiki/Philippe_Lottiaux",
+                    "photo": ""
+                },
+                {
+                    "name": "Julie Lechanteux",
+                    "party": "RN",
+                    "circo": 5,
+                    "wiki": "https://fr.wikipedia.org/wiki/Julie_Lechanteux",
+                    "photo": ""
+                },
+                {
+                    "name": "Frank Giletti",
+                    "party": "RN",
+                    "circo": 6,
+                    "wiki": "https://fr.wikipedia.org/wiki/Frank_Giletti",
+                    "photo": ""
+                },
+                {
+                    "name": "Frédéric Boccaletti",
+                    "party": "RN",
+                    "circo": 7,
+                    "wiki": "https://fr.wikipedia.org/wiki/Fr%C3%A9d%C3%A9ric_Boccaletti",
+                    "photo": ""
+                },
+                {
+                    "name": "Philippe Schreck",
+                    "party": "RN",
+                    "circo": 8,
+                    "wiki": "https://fr.wikipedia.org/wiki/Philippe_Schreck",
+                    "photo": ""
+                }
+            ],
+            "villes_20k": [
+                {
+                    "name": "Toulon",
+                    "pop": 178745,
+                    "mayor": "Josée Massi",
+                    "party": "HOR"
+                },
+                {
+                    "name": "La Seyne-sur-Mer",
+                    "pop": 62763,
+                    "mayor": "Nathalie Bicais",
+                    "party": "LR"
+                },
+                {
+                    "name": "Hyères",
+                    "pop": 55103,
+                    "mayor": "Jean-Pierre Giran",
+                    "party": "LR"
+                },
+                {
+                    "name": "Fréjus",
+                    "pop": 57082,
+                    "mayor": "David Rachline",
+                    "party": "RN"
+                },
+                {
+                    "name": "Draguignan",
+                    "pop": 39745,
+                    "mayor": "Richard Strambio",
+                    "party": "DVD"
+                },
+                {
+                    "name": "Saint-Raphaël",
+                    "pop": 35950,
+                    "mayor": "Frédéric Masquelier",
+                    "party": "LR"
+                },
+                {
+                    "name": "Six-Fours-les-Plages",
+                    "pop": 36203,
+                    "mayor": "Jean-Sébastien Vialatte",
+                    "party": "LR"
+                },
+                {
+                    "name": "La Garde",
+                    "pop": 25912,
+                    "mayor": "Hélène Arnaud-Bill",
+                    "party": "DVD"
+                },
+                {
+                    "name": "Sainte-Maxime",
+                    "pop": 14750,
+                    "mayor": "Vincent Morisse",
+                    "party": "DVD"
+                },
+                {
+                    "name": "La Valette-du-Var",
+                    "pop": 23955,
+                    "mayor": "Thierry Albertini",
+                    "party": "LR"
+                }
+            ]
+        },
+        "84": {
+            "name": "Vaucluse",
+            "prefect": {
+                "name": "Thierry Suquet",
+                "wiki": "https://fr.wikipedia.org/wiki/Thierry_Suquet",
+                "photo": "https://www.vaucluse.gouv.fr/var/ezflow_site/storage/images/services-de-l-etat/prefecture-et-sous-prefectures/le-corps-prefectoral-en-vaucluse/thierry-suquet-prefet-de-vaucluse/70948-1-fre-FR/Thierry-SUQUET-prefet-de-Vaucluse_medium.jpg"
+            },
+            "president_conseil": {
+                "name": "Dominique Santoni",
+                "wiki": "https://fr.wikipedia.org/wiki/Dominique_Santoni",
+                "photo": "https://upload.wikimedia.org/wikipedia/commons/e/ea/Dominique_Santoni_en_2021.jpg"
+            },
+            "president_cdpp": {
+                "name": "Pascal Ragot",
+                "wiki": "https://fr.wikipedia.org/wiki/Bonnieux",
+                "photo": "https://www.laprovence.com/media/2020/05/29/1590740000_ragot.jpg"
+            },
+            "population": 564566,
+            "postiers": null,
+            "postal_data": {
+                "points_contact": 0,
+                "bureaux": 0,
+                "etablissements_courrier": 0
+            },
+            "senators": [
+                {
+                    "name": "Jean-Baptiste Blanc",
+                    "party": "LR",
+                    "wiki": "https://fr.wikipedia.org/wiki/Jean-Baptiste_Blanc",
+                    "photo": ""
+                },
+                {
+                    "name": "Alain Milon",
+                    "party": "LR",
+                    "wiki": "https://fr.wikipedia.org/wiki/Alain_Milon",
+                    "photo": ""
+                },
+                {
+                    "name": "Lucien Stanzione",
+                    "party": "PS",
+                    "wiki": "https://fr.wikipedia.org/wiki/Lucien_Stanzione",
+                    "photo": ""
+                }
+            ],
+            "deputies": [
+                {
+                    "name": "Raphaël Arnault",
+                    "party": "LFI",
+                    "circo": 1,
+                    "wiki": "https://fr.wikipedia.org/wiki/Rapha%C3%ABl_Arnault",
+                    "photo": ""
+                },
+                {
+                    "name": "Bénédicte Auzanot",
+                    "party": "RN",
+                    "circo": 2,
+                    "wiki": "https://fr.wikipedia.org/wiki/B%C3%A9n%C3%A9dicte_Auzanot",
+                    "photo": ""
+                },
+                {
+                    "name": "Hervé de Lépinau",
+                    "party": "RN",
+                    "circo": 3,
+                    "wiki": "https://fr.wikipedia.org/wiki/Herv%C3%A9_de_L%C3%A9pinau",
+                    "photo": ""
+                },
+                {
+                    "name": "Marie-France Lorho",
+                    "party": "RN",
+                    "circo": 4,
+                    "wiki": "https://fr.wikipedia.org/wiki/Marie-France_Lorho",
+                    "photo": ""
+                },
+                {
+                    "name": "Catherine Rimbert",
+                    "party": "RN",
+                    "circo": 5,
+                    "wiki": "https://fr.wikipedia.org/wiki/Catherine_Rimbert",
+                    "photo": ""
+                }
+            ],
+            "villes_20k": [
+                {
+                    "name": "Avignon",
+                    "pop": 90330,
+                    "mayor": "Cécile Helle",
+                    "party": "PS"
+                },
+                {
+                    "name": "Carpentras",
+                    "pop": 30767,
+                    "mayor": "Serge Andrieu",
+                    "party": "DVG"
+                },
+                {
+                    "name": "Orange",
+                    "pop": 28949,
+                    "mayor": "Yann Bompard",
+                    "party": "REC"
+                },
+                {
+                    "name": "Cavaillon",
+                    "pop": 25956,
+                    "mayor": "Gérard Daudet",
+                    "party": "LR"
+                },
+                {
+                    "name": "L'Isle-sur-la-Sorgue",
+                    "pop": 19965,
+                    "mayor": "Pierre Gonzalvez",
+                    "party": "LR"
+                }
+            ]
+        }
+    }
+}
