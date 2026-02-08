@@ -860,5 +860,21 @@
                 }
             ]
         }
+    },
+    "region": {
+        "name": "Provence-Alpes-Côte d'Azur",
+        "pib": "207 Mds €",
+        "population": "5 219 000",
+        "communes": 946,
+        "cci_count": 8,
+        "president": {
+            "name": "Renaud Muselier",
+            "party": "Renaissance (RE)",
+            "photo": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1d/Renaud_MUSELIER.jpg/220px-Renaud_MUSELIER.jpg",
+            "wiki": "https://fr.wikipedia.org/wiki/Renaud_Muselier"
+        },
+        "dgs": {
+            "name": "Raphaëlle Siméoni"
+        }
     }
 }

@@ -9,7 +9,6 @@ let totalAsked = 0;
 // Initialize
 async function init() {
     console.log('--- Initializing Application ---');
-    checkAuth();
 
     try {
         // Fetch latest reference data (contains new photos/names)
@@ -35,22 +34,38 @@ async function init() {
         }
 
         data = remoteData;
+
+        // Merge regional data edits
+        if (localData.region) {
+            console.log('Merging local regional edits...');
+            Object.keys(localData.region).forEach(key => {
+                if (typeof localData.region[key] !== 'object') {
+                    data.region[key] = localData.region[key];
+                }
+            });
+            if (localData.region.dgs) data.region.dgs.name = localData.region.dgs.name;
+        }
+
         saveData(); // Save the merged state
     } catch (err) {
         console.error('Failed to load/merge data:', err);
         // Fallback to local data if sync fails
-        data = JSON.parse(localStorage.getItem('carnetData') || '{}');
+        data = JSON.parse(localStorage.getItem('carnetData') || '{"departments":{}, "region":{}}');
     }
 
     setupAuthEvents();
-    renderDeptGrid();
-    generateQuiz();
-    updateStats();
+    checkAuth(); // Call this AFTER data is loaded
+
+    // Initial render if already auth'd
+    if (currentUser && data.departments) {
+        renderDeptGrid();
+        generateQuiz();
+        updateStats();
+    }
 }
 
 function checkAuth() {
     console.log('--- Auth Check ---');
-    console.log('CurrentUser:', currentUser);
     const app = document.getElementById('app');
     const authContainer = document.getElementById('auth-container');
 
@@ -59,10 +74,12 @@ function checkAuth() {
         app.style.display = 'block';
         authContainer.style.display = 'none';
 
-        // Re-render if authenticated
-        renderDeptGrid();
-        generateQuiz();
-        updateStats();
+        // Render if data is available
+        if (data && data.departments && Object.keys(data.departments).length > 0) {
+            renderDeptGrid();
+            generateQuiz();
+            updateStats();
+        }
     } else {
         console.log('User NOT authenticated, showing auth box.');
         app.style.display = 'none';
@@ -106,6 +123,7 @@ function showFiche(code) {
     currentDept = code;
     const dept = data.departments[code];
     document.getElementById('dashboard').style.display = 'none';
+    document.getElementById('region-view').style.display = 'none';
     document.getElementById('fiche-view').style.display = 'block';
 
     document.getElementById('fiche-dept-name').textContent = `${code} - ${dept.name}`;
@@ -147,6 +165,22 @@ function showFiche(code) {
     document.getElementById('fiche-postal-courrier').textContent = dept.postal_data.etablissements_courrier;
 }
 
+function showRegionFiche() {
+    currentDept = null; // Important for toggleEdit logic
+    document.getElementById('dashboard').style.display = 'none';
+    document.getElementById('fiche-view').style.display = 'none';
+    document.getElementById('region-view').style.display = 'block';
+
+    const r = data.region;
+    document.getElementById('region-dgs').textContent = r.dgs.name;
+    document.getElementById('region-pib').textContent = r.pib;
+    document.getElementById('region-pop').textContent = r.population;
+    document.getElementById('region-communes').textContent = r.communes;
+    document.getElementById('region-cci').textContent = r.cci_count;
+
+    renderPerson('region-president-container', r.president, r.president.party);
+}
+
 function renderPerson(containerId, person, title, append = false) {
     const container = typeof containerId === 'string' ? document.getElementById(containerId) : containerId;
     const html = `
@@ -173,13 +207,25 @@ function renderPerson(containerId, person, title, append = false) {
 function backToDashboard() {
     document.getElementById('dashboard').style.display = 'grid';
     document.getElementById('fiche-view').style.display = 'none';
+    document.getElementById('region-view').style.display = 'none';
 }
 
 // Quiz Logic
 function generateQuiz() {
+    if (!data.departments || Object.keys(data.departments).length === 0) {
+        console.warn('Cannot generate quiz: no department data');
+        return;
+    }
+
     const codes = Object.keys(data.departments);
     const code = codes[Math.floor(Math.random() * codes.length)];
     const dept = data.departments[code];
+
+    if (!dept || !dept.villes_20k || dept.villes_20k.length === 0) {
+        // Fallback for depts without cities (shouldn't happen with our data but safe)
+        generateQuiz();
+        return;
+    }
 
     const questions = [
         { q: `Qui est le maire de ${dept.villes_20k[0].name} ?`, a: dept.villes_20k[0].mayor },
@@ -232,9 +278,9 @@ function updateStats() {
 
 // Edit Mode
 let isEditing = false;
-function toggleEdit() {
+function toggleEdit(btnId) {
     isEditing = !isEditing;
-    const btn = document.getElementById('edit-btn');
+    const btn = document.getElementById(btnId);
     const fields = document.querySelectorAll('.editable-field');
 
     btn.textContent = isEditing ? 'Enregistrer' : 'Mode Édition';
@@ -245,12 +291,22 @@ function toggleEdit() {
     });
 
     if (!isEditing) {
-        // Save
-        const dept = data.departments[currentDept];
-        dept.postiers = document.getElementById('fiche-postiers').textContent;
-        dept.postal_data.points_contact = parseInt(document.getElementById('fiche-postal-points').textContent) || 0;
-        dept.postal_data.bureaux = parseInt(document.getElementById('fiche-postal-bureaux').textContent) || 0;
-        dept.postal_data.etablissements_courrier = parseInt(document.getElementById('fiche-postal-courrier').textContent) || 0;
+        if (currentDept) {
+            // Save Dept
+            const dept = data.departments[currentDept];
+            dept.postiers = document.getElementById('fiche-postiers').textContent;
+            dept.postal_data.points_contact = parseInt(document.getElementById('fiche-postal-points').textContent) || 0;
+            dept.postal_data.bureaux = parseInt(document.getElementById('fiche-postal-bureaux').textContent) || 0;
+            dept.postal_data.etablissements_courrier = parseInt(document.getElementById('fiche-postal-courrier').textContent) || 0;
+        } else {
+            // Save Region (data.region)
+            console.log('Saving regional data:', data.region);
+            data.region.dgs.name = document.getElementById('region-dgs').textContent;
+            data.region.pib = document.getElementById('region-pib').textContent;
+            data.region.population = document.getElementById('region-pop').textContent;
+            data.region.communes = parseInt(document.getElementById('region-communes').textContent) || 0;
+            data.region.cci_count = parseInt(document.getElementById('region-cci').textContent) || 0;
+        }
         saveData();
         renderDeptGrid();
         alert('Modifications enregistrées localement.');
@@ -259,8 +315,11 @@ function toggleEdit() {
 
 // Events
 document.getElementById('back-btn').onclick = backToDashboard;
+document.getElementById('back-region-btn').onclick = backToDashboard;
+document.getElementById('region-btn').onclick = showRegionFiche;
 document.getElementById('quiz-submit').onclick = checkAnswer;
-document.getElementById('edit-btn').onclick = toggleEdit;
+document.getElementById('edit-btn').onclick = () => toggleEdit('edit-btn');
+document.getElementById('edit-btn-region').onclick = () => toggleEdit('edit-btn-region');
 document.getElementById('quiz-input').onkeypress = (e) => {
     if (e.key === 'Enter') checkAnswer();
 };

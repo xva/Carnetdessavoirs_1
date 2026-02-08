@@ -59,7 +59,10 @@
   <div id="app" style="display: none;">
     <header>
       <h1 class="logo">Carnet des savoirs</h1>
-      <button id="logout-btn" class="back-btn">Déconnexion</button>
+      <div style="display: flex; gap: 1rem;">
+        <button id="region-btn" class="back-btn">Fiche Régionale</button>
+        <button id="logout-btn" class="back-btn">Déconnexion</button>
+      </div>
     </header>
 
     <!-- Dashboard View -->
@@ -85,7 +88,7 @@
     </main>
 
     <!-- Fiche Detail View -->
-    <div id="fiche-view" class="fiche-view glass" style="padding: 2rem;">
+    <div id="fiche-view" class="fiche-view glass" style="padding: 2rem; display: none;">
       <div class="fiche-header">
         <div>
           <button id="back-btn" class="back-btn">← Retour</button>
@@ -134,6 +137,57 @@
             <p>Bureaux: <span id="fiche-postal-bureaux" class="editable-field" contenteditable="false">0</span></p>
             <p>Établissements courrier: <span id="fiche-postal-courrier" class="editable-field"
                 contenteditable="false">0</span></p>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <!-- Regional View -->
+    <div id="region-view" class="fiche-view glass" style="padding: 2rem; display: none;">
+      <div class="fiche-header">
+        <div>
+          <button id="back-region-btn" class="back-btn">← Retour</button>
+          <h2 style="margin-top: 1rem; font-size: 2.5rem;">Fiche Régionale</h2>
+          <p style="color: var(--text-dim);">Provence-Alpes-Côte d'Azur</p>
+        </div>
+        <button id="edit-btn-region" class="edit-btn">Mode Édition</button>
+      </div>
+
+      <div class="info-grid">
+        <!-- Executif Régional -->
+        <section class="info-section">
+          <h4>Exécutif Régional</h4>
+          <div id="region-president-container" style="margin-bottom: 1rem;"></div>
+          <div style="margin-top: 1.5rem;">
+            <p style="font-size: 0.9rem; color: var(--text-dim);">Directeur Général des Services :</p>
+            <p id="region-dgs" class="editable-field" contenteditable="false" style="font-weight: 600;"></p>
+          </div>
+        </section>
+
+        <!-- Données Économiques -->
+        <section class="info-section" style="grid-column: span 2;">
+          <h4>Données Économiques & Administratives</h4>
+          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem;">
+            <div class="glass" style="padding: 1rem;">
+              <p style="color: var(--text-dim); font-size: 0.8rem;">PIB</p>
+              <p id="region-pib" class="editable-field" contenteditable="false"
+                style="font-size: 1.2rem; font-weight: 700;"></p>
+            </div>
+            <div class="glass" style="padding: 1rem;">
+              <p style="color: var(--text-dim); font-size: 0.8rem;">Habitants</p>
+              <p id="region-pop" class="editable-field" contenteditable="false"
+                style="font-size: 1.2rem; font-weight: 700;"></p>
+            </div>
+            <div class="glass" style="padding: 1rem;">
+              <p style="color: var(--text-dim); font-size: 0.8rem;">Communes</p>
+              <p id="region-communes" class="editable-field" contenteditable="false"
+                style="font-size: 1.2rem; font-weight: 700;"></p>
+            </div>
+            <div class="glass" style="padding: 1rem;">
+              <p style="color: var(--text-dim); font-size: 0.8rem;">Nombre de CCI</p>
+              <p id="region-cci" class="editable-field" contenteditable="false"
+                style="font-size: 1.2rem; font-weight: 700;"></p>
+            </div>
           </div>
         </section>
       </div>
