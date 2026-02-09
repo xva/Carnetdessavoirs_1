@@ -60,7 +60,10 @@
     <header>
       <h1 class="logo">Carnet des savoirs</h1>
       <div style="display: flex; gap: 1rem;">
+        <button id="refresh-data-btn" class="back-btn" title="Mettre à jour les données">🔄 Actualiser</button>
+        <button id="personal-search-btn" class="back-btn">👤 Ma Fiche</button>
         <button id="region-btn" class="back-btn">Fiche Régionale</button>
+        <button id="marseille-btn" class="back-btn">📍 Marseille</button>
         <button id="logout-btn" class="back-btn">Déconnexion</button>
       </div>
     </header>
@@ -126,19 +129,6 @@
           <div id="fiche-villes" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;"></div>
         </section>
 
-        <!-- Postal Data -->
-        <section class="info-section">
-          <h4>Données Postales</h4>
-          <div style="display: flex; flex-direction: column; gap: 0.5rem;">
-            <p>Postiers: <span id="fiche-postiers" class="editable-field" contenteditable="false">Chargement...</span>
-            </p>
-            <p>Points de contact: <span id="fiche-postal-points" class="editable-field" contenteditable="false">0</span>
-            </p>
-            <p>Bureaux: <span id="fiche-postal-bureaux" class="editable-field" contenteditable="false">0</span></p>
-            <p>Établissements courrier: <span id="fiche-postal-courrier" class="editable-field"
-                contenteditable="false">0</span></p>
-          </div>
-        </section>
       </div>
     </div>
 
@@ -158,9 +148,18 @@
         <section class="info-section">
           <h4>Exécutif Régional</h4>
           <div id="region-president-container" style="margin-bottom: 1rem;"></div>
-          <div style="margin-top: 1.5rem;">
+          <div style="margin-top:  1.5rem;">
             <p style="font-size: 0.9rem; color: var(--text-dim);">Directeur Général des Services :</p>
             <p id="region-dgs" class="editable-field" contenteditable="false" style="font-weight: 600;"></p>
+          </div>
+          <div style="margin-top: 1.5rem;">
+            <p style="font-size: 0.9rem; color: var(--text-dim);">Directeur de Cabinet :</p>
+            <p id="region-directeur-cabinet" class="editable-field" contenteditable="false" style="font-weight: 600;">
+            </p>
+          </div>
+          <div style="margin-top: 1.5rem;">
+            <p style="font-size: 0.9rem; color: var(--text-dim);">Vice-Présidents :</p>
+            <div id="region-vice-presidents" style="display: flex; flex-direction: column; gap: 0.5rem;"></div>
           </div>
         </section>
 
@@ -188,13 +187,102 @@
               <p id="region-cci" class="editable-field" contenteditable="false"
                 style="font-size: 1.2rem; font-weight: 700;"></p>
             </div>
+            <div class="glass" style="padding: 1rem;">
+              <p style="color: var(--text-dim); font-size: 0.8rem;">Nombre d'EPCI</p>
+              <p id="region-epci" class="editable-field" contenteditable="false"
+                style="font-size: 1.2rem; font-weight: 700;"></p>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <!-- Marseille View -->
+    <div id="marseille-view" style="display: none;">
+      <button id="back-marseille-btn" class="back-btn">← Retour</button>
+      <div class="fiche-content">
+        <header class="fiche-header">
+          <div>
+            <h1>Marseille - Fiches par Secteur</h1>
+            <p class="subtitle">Analyse détaillée des 8 secteurs et 16 arrondissements</p>
+          </div>
+        </header>
+
+        <section class="glass" style="margin-bottom: 1.5rem; padding: 1.5rem;">
+          <h2>Informations Générales</h2>
+          <div
+            style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1rem;">
+            <div class="glass" style="padding: 1rem;">
+              <p style="color: var(--text-dim); font-size: 0.8rem;">Population Totale</p>
+              <p id="marseille-population" style="font-size: 1.2rem; font-weight: 700;"></p>
+            </div>
+            <div class="glass" style="padding: 1rem;">
+              <p style="color: var(--text-dim); font-size: 0.8rem;">Maire</p>
+              <div id="marseille-maire-container"></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="glass" style="padding: 1.5rem;">
+          <h2>Secteurs et Arrondissements</h2>
+          <div id="marseille-secteurs-container" style="margin-top: 1.5rem;"></div>
+        </section>
+      </div>
+    </div>
+    <!-- Personal View -->
+    <div id="personal-view" style="display: none;">
+      <button id="back-personal-btn" class="back-btn" onclick="backToDashboard()">← Retour</button>
+      <div class="fiche-content glass" style="margin-top: 1rem; padding: 2rem;">
+        <header class="fiche-header">
+          <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+            <div>
+              <h2 style="font-size: 2rem;">👤 Ma Fiche Personnelle</h2>
+              <p class="subtitle" style="margin-top: 0.5rem;">Gérez votre carnet de contacts et enrichissez-le
+                automatiquement.</p>
+            </div>
+            <button id="auto-complete-all-btn" class="back-btn"
+              title="Chercher les infos manquantes pour tous les contacts">⚡ Tout Actualiser</button>
+          </div>
+        </header>
+
+        <section class="glass" style="margin-top: 2rem; padding: 1.5rem;">
+          <h4 style="margin-bottom: 1rem;">Ajouter une personne</h4>
+          <div style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: flex-end;">
+            <div>
+              <label
+                style="display: block; font-size: 0.8rem; color: var(--text-dim); margin-bottom: 0.3rem;">Prénom</label>
+              <input type="text" id="personal-firstname" placeholder="Ex: Jean"
+                style="padding: 0.5rem; border-radius: 4px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.1); color: white;">
+            </div>
+            <div>
+              <label
+                style="display: block; font-size: 0.8rem; color: var(--text-dim); margin-bottom: 0.3rem;">Nom</label>
+              <input type="text" id="personal-lastname" placeholder="Ex: Dupont"
+                style="padding: 0.5rem; border-radius: 4px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.1); color: white;">
+            </div>
+            <div style="flex: 1; min-width: 200px;">
+              <label
+                style="display: block; font-size: 0.8rem; color: var(--text-dim); margin-bottom: 0.3rem;">Fonction</label>
+              <input type="text" id="personal-role" placeholder="Ex: Maire de..."
+                style="width: 100%; padding: 0.5rem; border-radius: 4px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.1); color: white;">
+            </div>
+            <button id="add-personal-btn" class="btn-primary" style="padding: 0.5rem 1rem;">➕ Ajouter</button>
+          </div>
+        </section>
+
+        <section class="glass" style="margin-top: 2rem; padding: 1.5rem;">
+          <h4 style="margin-bottom: 1rem;">Mes Contacts</h4>
+          <div id="personal-list-container"
+            style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1rem;">
+            <p style="grid-column: 1/-1; text-align: center; color: var(--text-dim); font-style: italic;">Aucun contact
+              pour le moment.</p>
           </div>
         </section>
       </div>
     </div>
   </div>
 
-  <script type="module" src="./script.js"></script>
+  <script type="module" src="./script.js?v=final"></script>
 </body>
 
 </html>

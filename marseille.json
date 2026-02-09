@@ -1,0 +1,280 @@
+{
+    "marseille": {
+        "nom": "Marseille",
+        "population_totale": 870715,
+        "maire_general": {
+            "nom": "Benoît Payan",
+            "parti": "DVG",
+            "photo": "https://upload.wikimedia.org/wikipedia/commons/f/fe/Beno%C3%AEt_Payan.jpg",
+            "wiki": "https://fr.wikipedia.org/wiki/Beno%C3%AEt_Payan",
+            "linkedin": ""
+        },
+        "secteurs": [
+            {
+                "numero": 1,
+                "nom": "Secteur 1",
+                "arrondissements": [
+                    "1er",
+                    "7e"
+                ],
+                "maire": {
+                    "nom": "Sophie Camard",
+                    "photo": "",
+                    "wiki": "",
+                    "linkedin": ""
+                },
+                "depute": {
+                    "nom": "Sabrina Agresti-Roubache",
+                    "circo": 2,
+                    "parti": "RE",
+                    "photo": "",
+                    "wiki": "https://fr.wikipedia.org/wiki/Sabrina_Agresti-Roubache",
+                    "linkedin": ""
+                },
+                "population": 71234,
+                "taux_chomage": "18.5%",
+                "taux_pauvrete": "32.1%",
+                "quartiers_principaux": [
+                    "Vieux-Port",
+                    "Opéra",
+                    "Saint-Victor",
+                    "Baille",
+                    "Endoume",
+                    "Saint-Giniez"
+                ]
+            },
+            {
+                "numero": 2,
+                "nom": "Secteur 2",
+                "arrondissements": [
+                    "2e",
+                    "3e"
+                ],
+                "maire": {
+                    "nom": "Lisette Narducci",
+                    "photo": "",
+                    "wiki": "",
+                    "linkedin": ""
+                },
+                "depute": {
+                    "nom": "Laurent Lhardit",
+                    "circo": 2,
+                    "parti": "PS",
+                    "photo": "",
+                    "wiki": "https://fr.wikipedia.org/wiki/Laurent_Lhardit",
+                    "linkedin": ""
+                },
+                "population": 76543,
+                "taux_chomage": "22.3%",
+                "taux_pauvrete": "38.7%",
+                "quartiers_principaux": [
+                    "Belle de Mai",
+                    "Saint-Charles",
+                    "La Joliette",
+                    "Arenc",
+                    "Saint-Lazare",
+                    "Saint-Mauront"
+                ]
+            },
+            {
+                "numero": 3,
+                "nom": "Secteur 3",
+                "arrondissements": [
+                    "4e",
+                    "5e"
+                ],
+                "maire": {
+                    "nom": "Benoit Payet",
+                    "photo": "",
+                    "wiki": "",
+                    "linkedin": ""
+                },
+                "depute": {
+                    "nom": "Gisèle Lelouis",
+                    "circo": 3,
+                    "parti": "RN",
+                    "photo": "",
+                    "wiki": "https://fr.wikipedia.org/wiki/Gis%C3%A8le_Lelouis",
+                    "linkedin": ""
+                },
+                "population": 82156,
+                "taux_chomage": "25.1%",
+                "taux_pauvrete": "41.2%",
+                "quartiers_principaux": [
+                    "Cinq-Avenues",
+                    "Baille",
+                    "La Conception",
+                    "Longchamp",
+                    "Saint-Pierre",
+                    "La Timone"
+                ]
+            },
+            {
+                "numero": 4,
+                "nom": "Secteur 4",
+                "arrondissements": [
+                    "6e",
+                    "8e"
+                ],
+                "maire": {
+                    "nom": "Yves Moraine",
+                    "photo": "",
+                    "wiki": "",
+                    "linkedin": ""
+                },
+                "depute": {
+                    "nom": "Manuel Bompard",
+                    "circo": 4,
+                    "parti": "LFI",
+                    "photo": "",
+                    "wiki": "https://fr.wikipedia.org/wiki/Manuel_Bompard",
+                    "linkedin": ""
+                },
+                "population": 95210,
+                "taux_chomage": "15.2%",
+                "taux_pauvrete": "20.5%",
+                "quartiers_principaux": [
+                    "Castellane",
+                    "Prado",
+                    "Périer",
+                    "Bonneveine",
+                    "Vauban",
+                    "Sainte-Anne"
+                ]
+            },
+            {
+                "numero": 5,
+                "nom": "Secteur 5",
+                "arrondissements": [
+                    "9e",
+                    "10e"
+                ],
+                "maire": {
+                    "nom": "Lionel Royer-Perreaut",
+                    "photo": "",
+                    "wiki": "",
+                    "linkedin": ""
+                },
+                "depute": {
+                    "nom": "Hendrik Davi",
+                    "circo": 5,
+                    "parti": "LFI",
+                    "photo": "",
+                    "wiki": "https://fr.wikipedia.org/wiki/Hendrik_Davi",
+                    "linkedin": ""
+                },
+                "population": 118970,
+                "taux_chomage": "19.8%",
+                "taux_pauvrete": "28.4%",
+                "quartiers_principaux": [
+                    "Mazargues",
+                    "La Panouse",
+                    "Sainte-Marguerite",
+                    "La Timone",
+                    "Saint-Tronc"
+                ]
+            },
+            {
+                "numero": 6,
+                "nom": "Secteur 6",
+                "arrondissements": [
+                    "11e",
+                    "12e"
+                ],
+                "maire": {
+                    "nom": "Monique Cordier",
+                    "photo": "",
+                    "wiki": "",
+                    "linkedin": ""
+                },
+                "depute": {
+                    "nom": "Olivier Fayssat",
+                    "circo": 6,
+                    "parti": "UDR",
+                    "photo": "",
+                    "wiki": "https://fr.wikipedia.org/wiki/Olivier_Fayssat",
+                    "linkedin": ""
+                },
+                "population": 104325,
+                "taux_chomage": "21.5%",
+                "taux_pauvrete": "35.6%",
+                "quartiers_principaux": [
+                    "Les Caillols",
+                    "La Panouse",
+                    "La Valentine",
+                    "Saint-Barnabé",
+                    "Montolivet",
+                    "Les Trois-Lucs"
+                ]
+            },
+            {
+                "numero": 7,
+                "nom": "Secteur 7",
+                "arrondissements": [
+                    "13e",
+                    "14e"
+                ],
+                "maire": {
+                    "nom": "Marc Gérault",
+                    "photo": "",
+                    "wiki": "",
+                    "linkedin": ""
+                },
+                "depute": {
+                    "nom": "Sébastien Delogu",
+                    "circo": 7,
+                    "parti": "LFI",
+                    "photo": "",
+                    "wiki": "https://fr.wikipedia.org/wiki/S%C3%A9bastien_Delogu",
+                    "linkedin": ""
+                },
+                "population": 156892,
+                "taux_chomage": "24.7%",
+                "taux_pauvrete": "39.8%",
+                "quartiers_principaux": [
+                    "Les Olives",
+                    "La Rose",
+                    "La Valbarelle",
+                    "Les Mourets",
+                    "Saint-Just",
+                    "Le Merlan",
+                    "Sainte-Marthe"
+                ]
+            },
+            {
+                "numero": 8,
+                "nom": "Secteur 8",
+                "arrondissements": [
+                    "15e",
+                    "16e"
+                ],
+                "maire": {
+                    "nom": "Samia Ghali",
+                    "photo": "",
+                    "wiki": "https://fr.wikipedia.org/wiki/Samia_Ghali",
+                    "linkedin": ""
+                },
+                "depute": {
+                    "nom": "Romain Tonussi",
+                    "circo": 8,
+                    "parti": "RN",
+                    "photo": "",
+                    "wiki": "https://fr.wikipedia.org/wiki/Romain_Tonussi",
+                    "linkedin": ""
+                },
+                "population": 165385,
+                "taux_chomage": "28.9%",
+                "taux_pauvrete": "45.3%",
+                "quartiers_principaux": [
+                    "La Castellane",
+                    "Plan d'Aou",
+                    "La Savine",
+                    "Bassens",
+                    "Saint-Antoine",
+                    "L'Estaque",
+                    "Les Riaux"
+                ]
+            }
+        ]
+    }
+}

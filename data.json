@@ -5,7 +5,7 @@
             "prefect": {
                 "name": "Isabelle Tomatis",
                 "wiki": "https://fr.wikipedia.org/wiki/Isabelle_Tomatis",
-                "photo": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Isabelle_Tomatis.jpg/220px-Isabelle_Tomatis.jpg"
+                "photo": "https://commons.wikimedia.org/wiki/Special:FilePath/Isabelle_Tomatis.jpg"
             },
             "president_conseil": {
                 "name": "Éliane Barreille",
@@ -124,7 +124,7 @@
             "president_conseil": {
                 "name": "Charles-Ange Ginésy",
                 "wiki": "https://fr.wikipedia.org/wiki/Charles-Ange_Gin%C3%A9sy",
-                "photo": "https://upload.wikimedia.org/wikipedia/commons/4/4b/Charles_Ange_GINESY.jpg"
+                "photo": "https://commons.wikimedia.org/wiki/Special:FilePath/Charles_Ange_GINESY.jpg"
             },
             "president_cdpp": {
                 "name": "Bertrand Gasiglia",
@@ -309,7 +309,7 @@
             "president_conseil": {
                 "name": "Martine Vassal",
                 "wiki": "https://fr.wikipedia.org/wiki/Martine_Vassal",
-                "photo": "https://upload.wikimedia.org/wikipedia/commons/c/c5/Martine_Vassal_UDG.jpg"
+                "photo": "https://commons.wikimedia.org/wiki/Special:FilePath/Martine_Vassal_UDG.jpg"
             },
             "president_cdpp": {
                 "name": "Jean-Christophe Carré",
@@ -756,7 +756,7 @@
             "president_conseil": {
                 "name": "Dominique Santoni",
                 "wiki": "https://fr.wikipedia.org/wiki/Dominique_Santoni",
-                "photo": "https://upload.wikimedia.org/wikipedia/commons/e/ea/Dominique_Santoni_en_2021.jpg"
+                "photo": "https://commons.wikimedia.org/wiki/Special:FilePath/Dominique_Santoni_en_2021.jpg"
             },
             "president_cdpp": {
                 "name": "Pascal Ragot",
@@ -867,14 +867,31 @@
         "population": "5 219 000",
         "communes": 946,
         "cci_count": 8,
+        "epci_count": 72,
         "president": {
             "name": "Renaud Muselier",
             "party": "Renaissance (RE)",
-            "photo": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1d/Renaud_MUSELIER.jpg/220px-Renaud_MUSELIER.jpg",
+            "photo": "https://commons.wikimedia.org/wiki/Special:FilePath/Renaud_MUSELIER.jpg",
             "wiki": "https://fr.wikipedia.org/wiki/Renaud_Muselier"
         },
         "dgs": {
             "name": "Raphaëlle Siméoni"
-        }
+        },
+        "directeur_cabinet": {
+            "name": "Dubois",
+            "prenom": "Julien"
+        },
+        "vice_presidents": [
+            {
+                "name": "Estrosi",
+                "prenom": "Christian",
+                "competences": "Transports et mobilités"
+            },
+            {
+                "name": "Joissains",
+                "prenom": "Sophie",
+                "competences": "Aménagement du territoire"
+            }
+        ]
     }
 }
