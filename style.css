@@ -468,6 +468,66 @@ header {
     pointer-events: none;
 }
 
+.person-action-icon.info-icon {
+    color: #818cf8;
+    background: rgba(99, 102, 241, 0.12);
+    border-color: rgba(99, 102, 241, 0.2);
+}
+
+.person-action-icon.info-icon:hover {
+    color: #a5b4fc;
+    background: rgba(99, 102, 241, 0.25);
+    border-color: rgba(139, 92, 246, 0.4);
+    box-shadow: 0 0 8px rgba(99, 102, 241, 0.2);
+}
+
+/* Interests Popover */
+#interests-popover {
+    position: fixed;
+    z-index: 10000;
+    width: 320px;
+    background: rgba(30, 30, 50, 0.95);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(139, 92, 246, 0.3);
+    border-radius: 14px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 16px rgba(99, 102, 241, 0.15);
+    animation: popoverIn 0.2s ease-out;
+    overflow: hidden;
+}
+
+@keyframes popoverIn {
+    from {
+        opacity: 0;
+        transform: translateY(6px) scale(0.96);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.interests-popover-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.65rem 0.9rem;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(139, 92, 246, 0.12));
+    border-bottom: 1px solid rgba(139, 92, 246, 0.15);
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #c4b5fd;
+}
+
+.interests-popover-body {
+    padding: 0.8rem 0.9rem;
+    font-size: 0.83rem;
+    line-height: 1.6;
+    color: var(--text-dim, #ccc);
+    font-style: italic;
+}
+
 /* Personal Contacts Table */
 .personal-contacts-table {
     width: 100%;
@@ -536,6 +596,64 @@ header {
 
 .personal-contacts-table .col-actions {
     text-align: right;
+}
+
+/* Mobile responsive: personal contacts table → stacked cards */
+@media (max-width: 768px) {
+    .personal-contacts-table {
+        table-layout: auto;
+    }
+
+    .personal-contacts-table thead {
+        display: none;
+    }
+
+    .personal-contacts-table tbody tr {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.3rem 0.8rem;
+        padding: 0.75rem 0.8rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        align-items: center;
+    }
+
+    .personal-contacts-table tbody tr:last-child {
+        border-bottom: none;
+    }
+
+    .personal-contacts-table tbody td {
+        display: inline;
+        padding: 0;
+        border-bottom: none;
+        overflow: visible;
+        text-overflow: unset;
+        white-space: normal;
+        font-size: 0.88rem;
+    }
+
+    .personal-contacts-table .col-name {
+        font-size: 0.95rem;
+    }
+
+    .personal-contacts-table .col-prenom {
+        font-size: 0.95rem;
+    }
+
+    .personal-contacts-table .col-function {
+        width: 100%;
+        font-size: 0.8rem;
+        opacity: 0.7;
+        order: 3;
+    }
+
+    .personal-contacts-table .col-actions {
+        margin-left: auto;
+        order: 4;
+    }
+
+    .personal-contacts-table .col-actions .person-actions {
+        gap: 0.3rem;
+    }
 }
 
 /* Photo Picker Grid */
@@ -687,6 +805,141 @@ header {
     background: rgba(239, 68, 68, 0.2);
     color: #f87171;
     border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+/* Quiz Actions Row */
+.quiz-actions {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+}
+
+.quiz-next-btn {
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    animation: pulseNext 2s ease-in-out infinite;
+}
+
+.quiz-next-btn:hover {
+    filter: brightness(1.15);
+    transform: scale(1.04);
+}
+
+@keyframes pulseNext {
+
+    0%,
+    100% {
+        box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4);
+    }
+
+    50% {
+        box-shadow: 0 0 0 8px rgba(34, 197, 94, 0);
+    }
+}
+
+/* Ville Cards */
+.ville-card {
+    transition: all 0.3s ease;
+}
+
+.ville-card:hover {
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+.ville-edit-btn,
+.ville-delete-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text-dim);
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+.ville-edit-btn:hover {
+    background: rgba(99, 102, 241, 0.25);
+    border-color: rgba(99, 102, 241, 0.4);
+    color: #a5b4fc;
+    transform: scale(1.1);
+}
+
+.ville-delete-btn:hover {
+    background: rgba(239, 68, 68, 0.25);
+    border-color: rgba(239, 68, 68, 0.4);
+    color: #f87171;
+    transform: scale(1.1);
+}
+
+.ville-add-card:hover {
+    border-color: rgba(99, 102, 241, 0.4) !important;
+    background: rgba(99, 102, 241, 0.08);
+    box-shadow: 0 0 20px rgba(99, 102, 241, 0.1);
+}
+
+.ville-refresh-section {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.btn-refresh {
+    width: 100%;
+    padding: 0.75rem 1.5rem;
+    border: 1px solid rgba(99, 102, 241, 0.3);
+    border-radius: var(--border-radius);
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(139, 92, 246, 0.15));
+    color: #a5b4fc;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-refresh:hover:not(:disabled) {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.3), rgba(139, 92, 246, 0.3));
+    border-color: rgba(99, 102, 241, 0.5);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+}
+
+.btn-refresh:disabled {
+    opacity: 0.7;
+    cursor: wait;
+}
+
+.ville-refresh-status {
+    margin-top: 0.75rem;
+    padding: 0.6rem 1rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    line-height: 1.5;
+    display: none;
+}
+
+.ville-refresh-status:not(:empty) {
+    display: block;
+}
+
+.ville-refresh-status.success {
+    background: rgba(34, 197, 94, 0.12);
+    border: 1px solid rgba(34, 197, 94, 0.3);
+    color: #4ade80;
+}
+
+.ville-refresh-status.warning {
+    background: rgba(234, 179, 8, 0.12);
+    border: 1px solid rgba(234, 179, 8, 0.3);
+    color: #facc15;
+}
+
+.ville-refresh-status.error {
+    background: rgba(239, 68, 68, 0.12);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: #f87171;
 }
 
 /* Edit Mode */

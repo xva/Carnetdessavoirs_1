@@ -176,21 +176,364 @@ function showFiche(code) {
     dept.deputies.forEach(d => renderPerson(deputiesContainer, d, `${d.party} - Circo ${d.circo}`, true));
 
     // Villes
+    renderVilles(code);
+}
+
+function renderVilles(code) {
+    const dept = data.departments[code];
     const villesContainer = document.getElementById('fiche-villes');
     villesContainer.innerHTML = '';
-    dept.villes_20k.forEach(v => {
+    dept.villes_20k.forEach((v, idx) => {
         const div = document.createElement('div');
-        div.className = 'glass';
+        div.className = 'glass ville-card';
         div.style.padding = '0.75rem';
+        div.style.position = 'relative';
         div.innerHTML = `
-            <strong>${v.name}</strong><br>
-            <span style="font-size: 0.8rem; color: var(--text-dim);">${v.pop.toLocaleString()} hab.</span><br>
-            Maire: ${v.mayor} (${v.party})
+            <div class="ville-card-content">
+                <strong>${v.name}</strong><br>
+                <span style="font-size: 0.8rem; color: var(--text-dim);">${v.pop.toLocaleString()} hab.</span><br>
+                Maire: ${v.mayor} (${v.party})
+            </div>
+            <div class="ville-edit-actions" style="display: ${isEditing ? 'flex' : 'none'}; gap: 0.4rem; position: absolute; top: 0.5rem; right: 0.5rem;">
+                <button class="ville-edit-btn" onclick="editVille('${code}', ${idx})" title="Modifier">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                </button>
+                <button class="ville-delete-btn" onclick="deleteVille('${code}', ${idx})" title="Supprimer">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                </button>
+            </div>
         `;
         villesContainer.appendChild(div);
     });
 
+    // Bouton Ajouter une ville (visible seulement en mode édition)
+    const addBtn = document.createElement('div');
+    addBtn.className = 'glass ville-add-card';
+    addBtn.id = 'add-ville-btn';
+    addBtn.style.display = isEditing ? 'flex' : 'none';
+    addBtn.style.padding = '0.75rem';
+    addBtn.style.cursor = 'pointer';
+    addBtn.style.alignItems = 'center';
+    addBtn.style.justifyContent = 'center';
+    addBtn.style.minHeight = '80px';
+    addBtn.style.border = '2px dashed rgba(255,255,255,0.15)';
+    addBtn.style.transition = 'all 0.3s ease';
+    addBtn.innerHTML = `<span style="font-size: 1.5rem; opacity: 0.5;">➕</span><span style="margin-left: 0.5rem; color: var(--text-dim);">Ajouter une ville</span>`;
+    addBtn.onclick = () => editVille(code, -1); // -1 = nouvelle ville
+    villesContainer.appendChild(addBtn);
+}
 
+async function refreshVilleData(cityName) {
+    const statusDiv = document.getElementById('ville-refresh-status');
+    if (!cityName) {
+        cityName = document.getElementById('edit-ville-name')?.value?.trim();
+    }
+    if (!cityName) {
+        if (statusDiv) { statusDiv.textContent = '⚠️ Entrez un nom de ville d\'abord.'; statusDiv.className = 'ville-refresh-status warning'; }
+        return;
+    }
+
+    const refreshBtn = document.getElementById('ville-refresh-btn');
+    if (refreshBtn) { refreshBtn.disabled = true; refreshBtn.textContent = '⏳ Recherche...'; }
+    if (statusDiv) { statusDiv.textContent = '🔍 Recherche sur Wikipedia...'; statusDiv.className = 'ville-refresh-status'; }
+
+    try {
+        // Step 1: Search Wikipedia — try the city name directly first, then with "commune"
+        let wikiTitle = null;
+        const searchVariants = [cityName, cityName + ' commune', cityName + ' (commune)'];
+
+        for (const searchTerm of searchVariants) {
+            const searchUrl = `https://fr.wikipedia.org/w/api.php?action=opensearch&search=${encodeURIComponent(searchTerm)}&limit=5&namespace=0&format=json&origin=*`;
+            const searchRes = await fetch(searchUrl).then(r => r.json());
+
+            if (searchRes[1] && searchRes[1].length > 0) {
+                // Find best match — prefer exact or close match, skip disambiguation pages
+                for (const title of searchRes[1]) {
+                    if (title.includes('(homonymie)')) continue;
+                    if (title.toLowerCase() === cityName.toLowerCase() ||
+                        title.toLowerCase().startsWith(cityName.toLowerCase())) {
+                        wikiTitle = title;
+                        break;
+                    }
+                }
+                if (!wikiTitle) wikiTitle = searchRes[1][0];
+                if (wikiTitle) break;
+            }
+        }
+
+        if (!wikiTitle) {
+            if (statusDiv) { statusDiv.textContent = '❌ Aucune page Wikipedia trouvée.'; statusDiv.className = 'ville-refresh-status error'; }
+            return;
+        }
+
+        if (statusDiv) { statusDiv.textContent = `📖 Page trouvée : ${wikiTitle}. Recherche Wikidata...`; }
+
+        // Step 2: Get Wikidata entity ID from Wikipedia
+        const wikiDataUrl = `https://fr.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(wikiTitle)}&prop=pageprops&format=json&origin=*`;
+        const wikiDataRes = await fetch(wikiDataUrl).then(r => r.json());
+        const pages = wikiDataRes.query.pages;
+        const wpPageId = Object.keys(pages)[0];
+        const wikidataId = pages[wpPageId]?.pageprops?.wikibase_item;
+
+        let foundMayor = null;
+        let foundPop = null;
+        let foundParty = null;
+
+        // Step 3: Use Wikidata REST API (more reliable than SPARQL)
+        if (wikidataId) {
+            if (statusDiv) { statusDiv.textContent = `🔗 Wikidata ${wikidataId} — récupération maire & population...`; }
+
+            const entityUrl = `https://www.wikidata.org/wiki/Special:EntityData/${wikidataId}.json`;
+            try {
+                const entityRes = await fetch(entityUrl).then(r => r.json());
+                const entity = entityRes.entities?.[wikidataId];
+
+                if (entity) {
+                    // Population (P1082) — get the most recent value
+                    const popClaims = entity.claims?.P1082;
+                    if (popClaims && popClaims.length > 0) {
+                        let latestPop = null;
+                        let latestDate = '';
+                        for (const claim of popClaims) {
+                            const popVal = claim.mainsnak?.datavalue?.value?.amount;
+                            // Get the point in time qualifier (P585)
+                            const qualifiers = claim.qualifiers?.P585;
+                            const dateVal = qualifiers?.[0]?.datavalue?.value?.time || '';
+                            if (!latestPop || dateVal > latestDate) {
+                                latestPop = popVal;
+                                latestDate = dateVal;
+                            }
+                        }
+                        if (latestPop) {
+                            foundPop = parseInt(latestPop.replace('+', ''));
+                        }
+                    }
+
+                    // Mayor / Head of government (P6) — find the current one (no end date P582)
+                    const mayorClaims = entity.claims?.P6;
+                    if (mayorClaims && mayorClaims.length > 0) {
+                        let currentMayorId = null;
+                        for (const claim of mayorClaims) {
+                            // Check if this mandate has ended (qualifier P582 = end date)
+                            const endQualifiers = claim.qualifiers?.P582;
+                            if (endQualifiers && endQualifiers.length > 0) continue; // mandate ended
+                            currentMayorId = claim.mainsnak?.datavalue?.value?.id;
+                        }
+                        // If no current mayor found, take the last one
+                        if (!currentMayorId && mayorClaims.length > 0) {
+                            currentMayorId = mayorClaims[mayorClaims.length - 1].mainsnak?.datavalue?.value?.id;
+                        }
+
+                        if (currentMayorId) {
+                            if (statusDiv) { statusDiv.textContent = `👤 Maire trouvé (${currentMayorId}). Récupération du nom...`; }
+                            // Fetch mayor's name and party
+                            const mayorUrl = `https://www.wikidata.org/wiki/Special:EntityData/${currentMayorId}.json`;
+                            const mayorRes = await fetch(mayorUrl).then(r => r.json());
+                            const mayorEntity = mayorRes.entities?.[currentMayorId];
+
+                            if (mayorEntity) {
+                                // Mayor name
+                                const frLabel = mayorEntity.labels?.fr?.value || mayorEntity.labels?.en?.value;
+                                if (frLabel) foundMayor = frLabel;
+
+                                // Mayor's party (P102)
+                                const partyClaims = mayorEntity.claims?.P102;
+                                if (partyClaims && partyClaims.length > 0) {
+                                    // Get the most recent party (the last one without end date)
+                                    let currentPartyId = null;
+                                    for (const pc of partyClaims) {
+                                        const endQ = pc.qualifiers?.P582;
+                                        if (endQ && endQ.length > 0) continue;
+                                        currentPartyId = pc.mainsnak?.datavalue?.value?.id;
+                                    }
+                                    if (!currentPartyId) {
+                                        currentPartyId = partyClaims[partyClaims.length - 1].mainsnak?.datavalue?.value?.id;
+                                    }
+                                    if (currentPartyId) {
+                                        const partyUrl = `https://www.wikidata.org/wiki/Special:EntityData/${currentPartyId}.json`;
+                                        const partyRes = await fetch(partyUrl).then(r => r.json());
+                                        const partyEntity = partyRes.entities?.[currentPartyId];
+                                        foundParty = partyEntity?.labels?.fr?.value || partyEntity?.labels?.en?.value;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            } catch (wdErr) {
+                console.warn('Wikidata REST API failed:', wdErr);
+            }
+        }
+
+        // Step 4: Fallback — Parse Wikipedia page text
+        if (!foundPop || !foundMayor) {
+            if (statusDiv) { statusDiv.textContent = `📄 Extraction depuis le texte Wikipedia...`; }
+            const extractUrl = `https://fr.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(wikiTitle)}&prop=extracts&exintro=true&explaintext=true&format=json&origin=*`;
+            const extractRes = await fetch(extractUrl).then(r => r.json());
+            const extractPages = extractRes.query.pages;
+            const extractPageId = Object.keys(extractPages)[0];
+            const extract = extractPages[extractPageId]?.extract || '';
+
+            if (!foundPop) {
+                const popMatch = extract.match(/(\d[\d\s\u00a0]*)[\s\u00a0]*habitants/);
+                if (popMatch) {
+                    foundPop = parseInt(popMatch[1].replace(/[\s\u00a0]/g, ''));
+                }
+            }
+            if (!foundMayor) {
+                const mayorMatch = extract.match(/maire[^.]*?est\s+([A-ZÀ-Ü][a-zà-ÿ]+(?:\s+[A-ZÀ-Ü][a-zà-ÿ]+)+)/i);
+                if (mayorMatch) {
+                    foundMayor = mayorMatch[1];
+                }
+            }
+        }
+
+        // Step 5: Apply found data to form fields
+        let updates = [];
+        if (foundMayor) {
+            document.getElementById('edit-ville-mayor').value = foundMayor;
+            updates.push(`Maire : ${foundMayor}`);
+        }
+        if (foundPop) {
+            document.getElementById('edit-ville-pop').value = foundPop;
+            updates.push(`Population : ${foundPop.toLocaleString('fr-FR')}`);
+        }
+        if (foundParty) {
+            const partyAbbreviations = {
+                'Rassemblement national': 'RN',
+                'Les Républicains': 'LR',
+                'Parti socialiste': 'PS',
+                'La République en marche': 'LREM',
+                'Renaissance': 'RE',
+                'Europe Écologie Les Verts': 'EELV',
+                'Parti communiste français': 'PCF',
+                'La France insoumise': 'LFI',
+                'Mouvement démocrate': 'MoDem',
+                'Union des démocrates et indépendants': 'UDI',
+                'Divers gauche': 'DVG',
+                'Divers droite': 'DVD',
+                'Divers centre': 'DVC',
+                'Horizons': 'HOR',
+            };
+            const shortParty = partyAbbreviations[foundParty] || foundParty;
+            document.getElementById('edit-ville-party').value = shortParty;
+            updates.push(`Parti : ${shortParty}`);
+        }
+
+        if (updates.length > 0) {
+            if (statusDiv) {
+                statusDiv.innerHTML = `✅ Données récupérées :<br>${updates.join('<br>')}`;
+                statusDiv.className = 'ville-refresh-status success';
+            }
+        } else {
+            if (statusDiv) {
+                statusDiv.textContent = '⚠️ Aucune donnée trouvée sur Wikipedia/Wikidata.';
+                statusDiv.className = 'ville-refresh-status warning';
+            }
+        }
+
+    } catch (err) {
+        console.error('Error refreshing ville data:', err);
+        if (statusDiv) {
+            statusDiv.textContent = '❌ Erreur de connexion.';
+            statusDiv.className = 'ville-refresh-status error';
+        }
+    } finally {
+        if (refreshBtn) { refreshBtn.disabled = false; refreshBtn.textContent = '🔄 Actualiser depuis Internet'; }
+    }
+}
+
+function editVille(deptCode, villeIndex) {
+    const dept = data.departments[deptCode];
+    const isNew = villeIndex === -1;
+    const ville = isNew ? { name: '', pop: 0, mayor: '', party: '' } : dept.villes_20k[villeIndex];
+
+    // Créer ou réutiliser le modal de ville
+    let modal = document.getElementById('edit-ville-modal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'edit-ville-modal';
+        modal.className = 'modal';
+        document.body.appendChild(modal);
+    }
+
+    modal.innerHTML = `
+        <div class="modal-content glass">
+            <div class="modal-header">
+                <h2>${isNew ? '➕ Nouvelle ville' : '✏️ Modifier la ville'}</h2>
+                <button class="close-btn" onclick="closeVilleModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Nom de la ville</label>
+                    <input type="text" id="edit-ville-name" value="${ville.name}" placeholder="Ex: Marseille">
+                </div>
+                <div class="form-group">
+                    <label>Population</label>
+                    <input type="number" id="edit-ville-pop" value="${ville.pop}" placeholder="Ex: 870715">
+                </div>
+                <div class="form-group">
+                    <label>Maire</label>
+                    <input type="text" id="edit-ville-mayor" value="${ville.mayor}" placeholder="Ex: Benoît Payan">
+                </div>
+                <div class="form-group">
+                    <label>Parti</label>
+                    <input type="text" id="edit-ville-party" value="${ville.party}" placeholder="Ex: DVG, LR, RN...">
+                </div>
+                <div class="ville-refresh-section">
+                    <button id="ville-refresh-btn" class="btn-refresh" onclick="refreshVilleData()">🔄 Actualiser depuis Internet</button>
+                    <div id="ville-refresh-status" class="ville-refresh-status"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeVilleModal()">Annuler</button>
+                <button class="btn-primary" onclick="saveVille('${deptCode}', ${villeIndex})">${isNew ? '➕ Ajouter' : '💾 Enregistrer'}</button>
+            </div>
+        </div>
+    `;
+    modal.style.display = 'flex';
+}
+
+function saveVille(deptCode, villeIndex) {
+    const name = document.getElementById('edit-ville-name').value.trim();
+    const pop = parseInt(document.getElementById('edit-ville-pop').value) || 0;
+    const mayor = document.getElementById('edit-ville-mayor').value.trim();
+    const party = document.getElementById('edit-ville-party').value.trim();
+
+    if (!name) {
+        alert('Le nom de la ville est obligatoire.');
+        return;
+    }
+
+    const dept = data.departments[deptCode];
+    const villeData = { name, pop, mayor, party };
+
+    if (villeIndex === -1) {
+        // Nouvelle ville
+        dept.villes_20k.push(villeData);
+    } else {
+        // Mise à jour
+        // Conserver les éventuels champs supplémentaires (photo, etc.)
+        dept.villes_20k[villeIndex] = { ...dept.villes_20k[villeIndex], ...villeData };
+    }
+
+    saveData();
+    closeVilleModal();
+    renderVilles(deptCode);
+}
+
+function deleteVille(deptCode, villeIndex) {
+    const dept = data.departments[deptCode];
+    const ville = dept.villes_20k[villeIndex];
+    if (!confirm(`Êtes-vous sûr de vouloir supprimer ${ville.name} ?`)) return;
+    dept.villes_20k.splice(villeIndex, 1);
+    saveData();
+    renderVilles(deptCode);
+}
+
+function closeVilleModal() {
+    const modal = document.getElementById('edit-ville-modal');
+    if (modal) modal.style.display = 'none';
 }
 
 function showRegionFiche() {
@@ -452,6 +795,55 @@ window.speak = function (text) {
 };
 
 
+function showInterestsPopover(personName, interestsText, btnElement) {
+    // Remove any existing popover
+    const existing = document.getElementById('interests-popover');
+    if (existing) existing.remove();
+
+    if (!interestsText) {
+        interestsText = 'Aucun centre d\'intérêts renseigné pour cette personne.';
+    }
+
+    const popover = document.createElement('div');
+    popover.id = 'interests-popover';
+    popover.innerHTML = `
+        <div class="interests-popover-header">
+            <span>💡 ${personName}</span>
+            <button onclick="document.getElementById('interests-popover')?.remove()" style="background:none; border:none; color:var(--text-dim, #aaa); cursor:pointer; font-size:1.1rem; line-height:1;">×</button>
+        </div>
+        <div class="interests-popover-body">${interestsText}</div>
+    `;
+    document.body.appendChild(popover);
+
+    // Position near the button
+    const rect = btnElement.getBoundingClientRect();
+    const popW = 320;
+    let left = rect.left + rect.width / 2 - popW / 2;
+    let top = rect.bottom + 8;
+
+    // Keep within viewport
+    if (left < 10) left = 10;
+    if (left + popW > window.innerWidth - 10) left = window.innerWidth - popW - 10;
+    if (top + 200 > window.innerHeight) {
+        top = rect.top - 8; // will be adjusted with transform
+        popover.style.transform = 'translateY(-100%)';
+    }
+
+    popover.style.left = left + 'px';
+    popover.style.top = top + 'px';
+
+    // Close on outside click
+    setTimeout(() => {
+        function closeHandler(e) {
+            if (!popover.contains(e.target) && e.target !== btnElement) {
+                popover.remove();
+                document.removeEventListener('click', closeHandler);
+            }
+        }
+        document.addEventListener('click', closeHandler);
+    }, 10);
+}
+
 function renderPerson(containerId, person, title, append = false) {
     const container = typeof containerId === 'string' ? document.getElementById(containerId) : containerId;
 
@@ -463,6 +855,8 @@ function renderPerson(containerId, person, title, append = false) {
     const linkedinSearch = `https://www.linkedin.com/search/results/all/?keywords=${encodeURIComponent(person.name)}`;
     const escapedName = person.name.replace(/'/g, "\\'");
     const escapedTitle = title ? title.replace(/'/g, "\\'") : '';
+
+    const interestsText = (person.interests || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
 
     const html = `
         <div class="person-card" data-person-name="${person.name}">
@@ -486,6 +880,9 @@ function renderPerson(containerId, person, title, append = false) {
                      </button>
                 </div>
                 <div class="person-actions">
+                    <button class="person-action-icon info-icon" title="Centre d'intérêts" onclick="event.stopPropagation(); showInterestsPopover('${escapedName}', '${interestsText}', this)">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                    </button>
                     <a href="${wikiUrl}" target="_blank" rel="noopener" class="person-action-icon ${!wikiUrl ? 'disabled' : ''}" title="Wikipedia" onclick="event.stopPropagation(); ${!wikiUrl ? 'event.preventDefault();' : ''}">
                         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.09 13.119c-.936 1.932-2.217 4.548-2.853 5.728-.616 1.074-1.127.931-1.532.029-1.406-3.321-4.293-9.144-5.651-12.409-.251-.601-.441-.987-.619-1.139-.181-.15-.554-.24-1.122-.271C.103 5.033 0 4.982 0 4.898v-.455l.052-.045c.924-.005 5.401 0 5.401 0l.051.045v.434c0 .119-.075.176-.225.176l-.564.031c-.485.029-.727.164-.727.436 0 .135.053.33.166.601 1.082 2.646 4.818 10.521 4.818 10.521l2.681-5.476-2.007-4.218c-.253-.543-.489-.993-.71-1.1-.213-.109-.553-.17-1.024-.184-.127-.003-.19-.06-.19-.17v-.46l.048-.044h4.657l.05.044v.434c0 .119-.074.176-.222.176l-.387.02c-.485.029-.749.17-.749.436 0 .135.063.33.174.601l1.807 3.887 1.81-3.674c.112-.27.174-.47.174-.601 0-.266-.238-.407-.714-.436l-.519-.02c-.149 0-.224-.057-.224-.176v-.434l.052-.044h4.024l.052.044v.46c0 .11-.062.167-.189.17-.416.014-.754.075-.972.184-.215.107-.478.557-.726 1.1l-2.205 4.436 2.695 5.502 4.593-10.595c.117-.27.172-.466.172-.601 0-.266-.22-.407-.68-.436l-.637-.02c-.15 0-.224-.057-.224-.176v-.434l.052-.044h4.04l.05.044v.46c0 .11-.063.167-.189.17-.492.014-.862.109-1.107.283-.246.174-.479.555-.701 1.139L13.878 19.05c-.395.846-.891.846-1.287 0l-2.876-5.93h-.001l2.376.001z"/></svg>
                     </a>
@@ -772,7 +1169,13 @@ function checkAnswer() {
     feedback.style.display = 'block';
     updateStats();
 
-    setTimeout(generateQuiz, 3000);
+    // Afficher le bouton "Question suivante" au lieu d'avancer automatiquement
+    const submitBtn = document.getElementById('quiz-submit');
+    const nextBtn = document.getElementById('quiz-next');
+    const quizInput = document.getElementById('quiz-input');
+    if (submitBtn) submitBtn.style.display = 'none';
+    if (nextBtn) nextBtn.style.display = 'inline-block';
+    if (quizInput) quizInput.disabled = true;
 }
 
 function updateStats() {
@@ -799,6 +1202,14 @@ function toggleEdit(btnId) {
     editPersonButtons.forEach(btn => {
         btn.style.display = isEditing ? 'inline-flex' : 'none';
     });
+
+    // Afficher/cacher les boutons d'édition des villes
+    const villeEditActions = document.querySelectorAll('.ville-edit-actions');
+    villeEditActions.forEach(el => {
+        el.style.display = isEditing ? 'flex' : 'none';
+    });
+    const addVilleBtn = document.getElementById('add-ville-btn');
+    if (addVilleBtn) addVilleBtn.style.display = isEditing ? 'flex' : 'none';
 
     if (!isEditing) {
         if (currentDept) {
@@ -895,6 +1306,18 @@ document.getElementById('region-btn').onclick = showRegionFiche;
 document.getElementById('marseille-btn').onclick = showMarseilleFiche;
 document.getElementById('refresh-data-btn').onclick = refreshData;
 document.getElementById('quiz-submit').onclick = checkAnswer;
+const quizNextBtn = document.getElementById('quiz-next');
+if (quizNextBtn) {
+    quizNextBtn.onclick = () => {
+        const submitBtn = document.getElementById('quiz-submit');
+        const nextBtn = document.getElementById('quiz-next');
+        const quizInput = document.getElementById('quiz-input');
+        if (submitBtn) submitBtn.style.display = 'inline-block';
+        if (nextBtn) nextBtn.style.display = 'none';
+        if (quizInput) quizInput.disabled = false;
+        generateQuiz();
+    };
+}
 document.getElementById('edit-btn').onclick = () => toggleEdit('edit-btn');
 document.getElementById('edit-btn-region').onclick = () => toggleEdit('edit-btn-region');
 document.getElementById('quiz-input').onkeypress = (e) => {
@@ -1223,6 +1646,32 @@ function showPersonEditModalComplete(person, personType, deptCode, personTitle) 
             `;
         }
         extraFieldsContainer.innerHTML = extraFieldsHTML;
+    }
+
+    // Centre d'intérêts
+    const interestsSection = document.getElementById('edit-person-interests-section');
+    const interestsDisplay = document.getElementById('interests-display');
+    const interestsTextarea = document.getElementById('edit-person-interests');
+    const interestsToggle = document.getElementById('interests-edit-toggle');
+
+    if (interestsSection && interestsDisplay && interestsTextarea) {
+        const interests = person.interests || '';
+        interestsTextarea.value = interests;
+
+        if (interests) {
+            // Mode affichage
+            interestsDisplay.textContent = interests;
+            interestsDisplay.style.display = 'block';
+            interestsTextarea.style.display = 'none';
+            interestsSection.style.display = 'block';
+            if (interestsToggle) interestsToggle.style.display = 'inline-block';
+        } else {
+            // Mode édition directe si pas d'intérêts
+            interestsDisplay.style.display = 'none';
+            interestsTextarea.style.display = 'block';
+            interestsSection.style.display = 'block';
+            if (interestsToggle) interestsToggle.style.display = 'none';
+        }
     }
 
     // Store metadata for save
@@ -1554,6 +2003,31 @@ function selectPickerPhoto(url, el) {
     statusDiv.className = 'photo-search-status success';
 }
 
+function toggleInterestsEdit() {
+    const display = document.getElementById('interests-display');
+    const textarea = document.getElementById('edit-person-interests');
+    const toggleBtn = document.getElementById('interests-edit-toggle');
+
+    if (display && textarea) {
+        if (textarea.style.display === 'none') {
+            // Switch to edit mode
+            display.style.display = 'none';
+            textarea.style.display = 'block';
+            textarea.focus();
+            if (toggleBtn) toggleBtn.innerHTML = '👁️ Aperçu';
+        } else {
+            // Switch to display mode
+            const text = textarea.value.trim();
+            if (text) {
+                display.textContent = text;
+                display.style.display = 'block';
+                textarea.style.display = 'none';
+                if (toggleBtn) toggleBtn.innerHTML = '✏️ Modifier';
+            }
+        }
+    }
+}
+
 function closePersonEditModal() {
     document.getElementById('edit-person-modal').style.display = 'none';
 }
@@ -1565,6 +2039,8 @@ function savePersonEdit() {
     const wiki = document.getElementById('edit-person-wiki').value;
     const linkedin = document.getElementById('edit-person-linkedin').value;
     const photo = document.getElementById('edit-person-photo').value;
+    const interestsInput = document.getElementById('edit-person-interests');
+    const interests = interestsInput ? interestsInput.value.trim() : null;
 
     // Récupérer les champs supplémentaires s'ils existent
     const partyInput = document.getElementById('edit-person-party');
@@ -1596,6 +2072,7 @@ function savePersonEdit() {
             senator.linkedin = linkedin;
             senator.photo = photo;
             if (party !== null) senator.party = party;
+            if (interests !== null) senator.interests = interests;
             personFound = true;
             break;
         }
@@ -1609,6 +2086,7 @@ function savePersonEdit() {
             deputy.photo = photo;
             if (party !== null) deputy.party = party;
             if (circo !== null && !isNaN(circo)) deputy.circo = circo;
+            if (interests !== null) deputy.interests = interests;
             personFound = true;
             break;
         }
@@ -1619,6 +2097,7 @@ function savePersonEdit() {
             dept.prefect.wiki = wiki;
             dept.prefect.linkedin = linkedin;
             dept.prefect.photo = photo;
+            if (interests !== null) dept.prefect.interests = interests;
             personFound = true;
             break;
         }
@@ -1629,6 +2108,7 @@ function savePersonEdit() {
             dept.president_conseil.wiki = wiki;
             dept.president_conseil.linkedin = linkedin;
             dept.president_conseil.photo = photo;
+            if (interests !== null) dept.president_conseil.interests = interests;
             personFound = true;
             break;
         }
@@ -1638,6 +2118,7 @@ function savePersonEdit() {
             dept.president_cdpp.wiki = wiki;
             dept.president_cdpp.linkedin = linkedin;
             dept.president_cdpp.photo = photo;
+            if (interests !== null) dept.president_cdpp.interests = interests;
             personFound = true;
             break;
         }
@@ -1650,6 +2131,7 @@ function savePersonEdit() {
         data.region.president.linkedin = linkedin;
         data.region.president.photo = photo;
         if (party !== null) data.region.president.party = party;
+        if (interests !== null) data.region.president.interests = interests;
         personFound = true;
     }
 
@@ -1665,6 +2147,7 @@ function savePersonEdit() {
             dc.wiki = wiki;
             dc.linkedin = linkedin;
             dc.photo = photo;
+            if (interests !== null) dc.interests = interests;
             personFound = true;
         }
     }
@@ -1675,6 +2158,7 @@ function savePersonEdit() {
         data.region.dgs.wiki = wiki;
         data.region.dgs.linkedin = linkedin;
         data.region.dgs.photo = photo;
+        if (interests !== null) data.region.dgs.interests = interests;
         personFound = true;
     }
 
@@ -1691,6 +2175,7 @@ function savePersonEdit() {
             vp.wiki = wiki;
             vp.linkedin = linkedin;
             vp.photo = photo;
+            if (interests !== null) vp.interests = interests;
             // On garde les compétences existantes
             personFound = true;
         }
@@ -1707,6 +2192,7 @@ function savePersonEdit() {
             m.maire_general.linkedin = linkedin;
             m.maire_general.photo = photo;
             if (party !== null) m.maire_general.party = party;
+            if (interests !== null) m.maire_general.interests = interests;
             personFound = true;
         }
 
@@ -1720,6 +2206,7 @@ function savePersonEdit() {
                     secteur.maire.linkedin = linkedin;
                     secteur.maire.photo = photo;
                     if (party !== null) secteur.maire.parti = party;
+                    if (interests !== null) secteur.maire.interests = interests;
                     personFound = true;
                     break;
                 }
@@ -1731,6 +2218,7 @@ function savePersonEdit() {
                     secteur.depute.photo = photo;
                     if (party !== null) secteur.depute.parti = party;
                     if (circo !== null && !isNaN(circo)) secteur.depute.circo = circo;
+                    if (interests !== null) secteur.depute.interests = interests;
                     personFound = true;
                     break;
                 }
@@ -1779,6 +2267,7 @@ function savePersonEdit() {
             p.wiki = wiki;
             p.linkedin = linkedin;
             p.photo = photo;
+            if (interests !== null) p.interests = interests;
 
             localStorage.setItem('personalData', JSON.stringify(personalData));
             personFound = true;
@@ -1902,6 +2391,8 @@ function renderPersonalList() {
         const wikiUrl = p.wiki || '';
         const linkedinSearch = `https://www.linkedin.com/search/results/all/?keywords=${encodeURIComponent(fullname)}`;
 
+        const interestsText = (p.interests || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+
         const tr = document.createElement('tr');
         tr.innerHTML = `
             <td class="col-name"><strong>${p.name || ''}</strong></td>
@@ -1909,6 +2400,9 @@ function renderPersonalList() {
             <td class="col-function">${p.function || ''}</td>
             <td class="col-actions">
                 <div class="person-actions">
+                    <button class="person-action-icon info-icon" title="Centre d'intérêts" onclick="event.stopPropagation(); showInterestsPopover('${escapedName}', '${interestsText}', this)">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                    </button>
                     <a href="${wikiUrl}" target="_blank" rel="noopener" class="person-action-icon ${!wikiUrl ? 'disabled' : ''}" title="Wikipedia" onclick="event.stopPropagation(); ${!wikiUrl ? 'event.preventDefault();' : ''}">
                         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.09 13.119c-.936 1.932-2.217 4.548-2.853 5.728-.616 1.074-1.127.931-1.532.029-1.406-3.321-4.293-9.144-5.651-12.409-.251-.601-.441-.987-.619-1.139-.181-.15-.554-.24-1.122-.271C.103 5.033 0 4.982 0 4.898v-.455l.052-.045c.924-.005 5.401 0 5.401 0l.051.045v.434c0 .119-.075.176-.225.176l-.564.031c-.485.029-.727.164-.727.436 0 .135.053.33.166.601 1.082 2.646 4.818 10.521 4.818 10.521l2.681-5.476-2.007-4.218c-.253-.543-.489-.993-.71-1.1-.213-.109-.553-.17-1.024-.184-.127-.003-.19-.06-.19-.17v-.46l.048-.044h4.657l.05.044v.434c0 .119-.074.176-.222.176l-.387.02c-.485.029-.749.17-.749.436 0 .135.063.33.174.601l1.807 3.887 1.81-3.674c.112-.27.174-.47.174-.601 0-.266-.238-.407-.714-.436l-.519-.02c-.149 0-.224-.057-.224-.176v-.434l.052-.044h4.024l.052.044v.46c0 .11-.062.167-.189.17-.416.014-.754.075-.972.184-.215.107-.478.557-.726 1.1l-2.205 4.436 2.695 5.502 4.593-10.595c.117-.27.172-.466.172-.601 0-.266-.22-.407-.68-.436l-.637-.02c-.15 0-.224-.057-.224-.176v-.434l.052-.044h4.04l.05.044v.46c0 .11-.063.167-.189.17-.492.014-.862.109-1.107.283-.246.174-.479.555-.701 1.139L13.878 19.05c-.395.846-.891.846-1.287 0l-2.876-5.93h-.001l2.376.001z"/></svg>
                     </a>
@@ -2137,6 +2631,23 @@ function createEditPersonModal() {
                 
                 <!-- Conteneur pour les champs supplémentaires (parti, circo, etc.) -->
                 <div id="edit-person-extra-fields"></div>
+
+                <!-- Section Centre d'intérêts -->
+                <div id="edit-person-interests-section" class="interests-section" style="margin-top: 1.5rem; display: none;">
+                    <div class="interests-header" style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem;">
+                        <span style="font-size: 1.2rem;">💡</span>
+                        <label style="font-size: 0.95rem; font-weight: 600; color: var(--text-bright, #e0e0e0); letter-spacing: 0.3px;">Centre d'intérêts</label>
+                        <button type="button" id="interests-edit-toggle" onclick="toggleInterestsEdit()" 
+                                style="margin-left: auto; padding: 0.2rem 0.6rem; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; color: var(--text-dim, #aaa); font-size: 0.75rem; cursor: pointer; transition: all 0.2s;" 
+                                onmouseover="this.style.background='rgba(255,255,255,0.2)'" onmouseout="this.style.background='rgba(255,255,255,0.1)'">
+                            ✏️ Modifier
+                        </button>
+                    </div>
+                    <div id="interests-display" class="interests-display" style="padding: 0.85rem 1rem; background: linear-gradient(135deg, rgba(99, 102, 241, 0.12), rgba(139, 92, 246, 0.08)); border: 1px solid rgba(139, 92, 246, 0.2); border-radius: 10px; color: var(--text-dim, #ccc); font-size: 0.88rem; line-height: 1.55; font-style: italic;"></div>
+                    <textarea id="edit-person-interests" 
+                              placeholder="Décrivez les centres d'intérêts de cette personne en 2-3 phrases... (passions, hobbies, sujets de conversation favoris)" 
+                              style="display: none; width:100%; min-height: 90px; padding:0.75rem; background:rgba(255,255,255,0.08); border:1px solid rgba(139, 92, 246, 0.3); color:white; border-radius:8px; font-size:0.88rem; line-height:1.5; resize: vertical; font-family: inherit;"></textarea>
+                </div>
             </div>
             <div class="modal-footer" style="margin-top: 1.5rem; display: flex; justify-content: flex-end; gap: 1rem;">
                 <button onclick="closePersonEditModal()" class="btn-secondary">Fermer</button>
@@ -2223,6 +2734,13 @@ window.searchPersonImages = searchPersonImages;
 window.selectPickerPhoto = selectPickerPhoto;
 window.openPhotoModal = openPhotoModal;
 window.closePhotoModal = closePhotoModal;
+window.editVille = editVille;
+window.saveVille = saveVille;
+window.deleteVille = deleteVille;
+window.closeVilleModal = closeVilleModal;
+window.refreshVilleData = refreshVilleData;
+window.showInterestsPopover = showInterestsPopover;
+window.toggleInterestsEdit = toggleInterestsEdit;
 
 // Events Personal
 const personalBtn = document.getElementById('personal-search-btn');
