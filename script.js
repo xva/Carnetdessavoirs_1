@@ -2438,11 +2438,8 @@ window.editPersonPhoto = editPersonPhoto;
 window.editPersonComplete = editPersonComplete;
 window.closePersonEditModal = closePersonEditModal;
 window.savePersonEdit = savePersonEdit;
-window.showPersonalView = showPersonalView;
-window.addPersonalContact = addPersonalContact;
-window.removePersonalContact = removePersonalContact;
 window.autoFillMissingInfo = autoFillMissingInfo;
-window.autoCompleteAll = autoCompleteAll;
+
 window.searchPersonImages = searchPersonImages;
 window.selectPickerPhoto = selectPickerPhoto;
 window.openPhotoModal = openPhotoModal;
