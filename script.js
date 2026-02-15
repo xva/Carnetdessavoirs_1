@@ -3,7 +3,7 @@ let marseilleData = null;
 
 let personalData = JSON.parse(localStorage.getItem('personalData') || '[]');
 let users = JSON.parse(localStorage.getItem('carnetUsers') || '[]');
-let currentUser = JSON.parse(sessionStorage.getItem('currentUser') || 'null');
+let currentUser = JSON.parse(localStorage.getItem('rememberedUser') || sessionStorage.getItem('currentUser') || 'null');
 let currentDept = null;
 let currentQuestion = null;
 let score = 0;
@@ -15,9 +15,9 @@ async function init() {
 
     try {
         // Update admin password in localStorage if exists
-        const adminIdx = users.findIndex(u => u.email === 'admin');
-        if (adminIdx !== -1 && users[adminIdx].password !== 'drgpaca2026') {
-            users[adminIdx].password = 'drgpaca2026';
+        const adminIdx = users.findIndex(u => u.email === 'drg');
+        if (adminIdx !== -1 && users[adminIdx].password !== 'paca') {
+            users[adminIdx].password = 'paca';
             localStorage.setItem('carnetUsers', JSON.stringify(users));
             console.log('Security: Admin password updated.');
         }
@@ -164,7 +164,7 @@ function showFiche(code) {
     // Executif
     renderPerson('fiche-prefect', dept.prefect, 'Préfet');
     renderPerson('fiche-pres-conseil', dept.president_conseil, 'Président Conseil Dép.');
-    renderPerson('fiche-pres-cdpp', dept.president_cdpp, 'Président CDPP');
+    renderPerson('fiche-pres-cdpp', dept.president_cdpp, 'Président CDPPT');
 
     // Parlementaires
     const senatorsContainer = document.getElementById('fiche-senators');
@@ -364,7 +364,14 @@ function showMarseilleFiche() {
                 <!-- Maire de secteur -->
                 <div class="glass" style="padding: 1rem; cursor: pointer;" onclick="editPersonComplete('${secteur.maire.nom.replace(/'/g, "\\'")}', 'Maire de Secteur', this)">
                     <p style="color: var(--text-dim); font-size: 0.8rem; margin-bottom: 0.5rem;">Maire de secteur</p>
-                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <div style="display: flex; align-items: center; gap: 0.75rem;">
+                        <div class="person-photo-container">
+                            <img src="${secteur.maire.photo || 'broken'}" 
+                                 class="person-photo ${!secteur.maire.photo ? 'broken' : ''}" 
+                                 style="width: 40px; height: 40px;"
+                                 alt="${secteur.maire.nom}"
+                                 onerror="this.classList.add('broken'); this.src='data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'">
+                        </div>
                         <div>
                             <div style="display: flex; align-items: center; gap: 0.5rem;">
                                 <strong>${secteur.maire.nom}</strong>
@@ -376,7 +383,14 @@ function showMarseilleFiche() {
                 <!-- Député -->
                 <div class="glass" style="padding: 1rem; cursor: pointer;" onclick="editPersonComplete('${secteur.depute.nom.replace(/'/g, "\\'")}', 'Député (Circo ${secteur.depute.circo})', this)">
                     <p style="color: var(--text-dim); font-size: 0.8rem; margin-bottom: 0.5rem;">Député (Circo ${secteur.depute.circo})</p>
-                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <div style="display: flex; align-items: center; gap: 0.75rem;">
+                        <div class="person-photo-container">
+                            <img src="${secteur.depute.photo || 'broken'}" 
+                                 class="person-photo ${!secteur.depute.photo ? 'broken' : ''}" 
+                                 style="width: 40px; height: 40px;"
+                                 alt="${secteur.depute.nom}"
+                                 onerror="this.classList.add('broken'); this.src='data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'">
+                        </div>
                         <div>
                             <div style="display: flex; align-items: center; gap: 0.5rem;">
                                 <strong>${secteur.depute.nom}</strong>
@@ -444,6 +458,12 @@ function renderPerson(containerId, person, title, append = false) {
     // On garde la photo, même si elle est cassée ou absente
     const photoUrl = person.photo || 'broken';
 
+    // Build action icons
+    const wikiUrl = person.wiki || '';
+    const linkedinSearch = `https://www.linkedin.com/search/results/all/?keywords=${encodeURIComponent(person.name)}`;
+    const escapedName = person.name.replace(/'/g, "\\'");
+    const escapedTitle = title ? title.replace(/'/g, "\\'") : '';
+
     const html = `
         <div class="person-card" data-person-name="${person.name}">
             <div class="person-photo-container">
@@ -454,16 +474,27 @@ function renderPerson(containerId, person, title, append = false) {
             </div>
             <div class="person-info">
                 <div class="person-name-row" style="display:flex; align-items:center; justify-content:space-between;">
-                     <div onclick="editPersonComplete('${person.name.replace(/'/g, "\\'")}', '${title.replace(/'/g, "\\'")}', this)"
+                     <div onclick="editPersonComplete('${escapedName}', '${escapedTitle}', this)"
                           style="cursor: pointer; flex-grow:1;"
                           title="Voir le profil complet">
                         <strong>${person.name}</strong>
                      </div>
-                     <button onclick="event.stopPropagation(); window.speak('${person.name.replace(/'/g, "\\'")}. ${title ? title.replace(/'/g, "\\'") : ''}')"
+                     <button onclick="event.stopPropagation(); window.speak('${escapedName}. ${escapedTitle}')"
                              style="background:none; border:none; cursor:pointer; font-size:1.1rem; padding:0 0.2rem;"
                              title="Écouter">
                          🔊
                      </button>
+                </div>
+                <div class="person-actions">
+                    <a href="${wikiUrl}" target="_blank" rel="noopener" class="person-action-icon ${!wikiUrl ? 'disabled' : ''}" title="Wikipedia" onclick="event.stopPropagation(); ${!wikiUrl ? 'event.preventDefault();' : ''}">
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.09 13.119c-.936 1.932-2.217 4.548-2.853 5.728-.616 1.074-1.127.931-1.532.029-1.406-3.321-4.293-9.144-5.651-12.409-.251-.601-.441-.987-.619-1.139-.181-.15-.554-.24-1.122-.271C.103 5.033 0 4.982 0 4.898v-.455l.052-.045c.924-.005 5.401 0 5.401 0l.051.045v.434c0 .119-.075.176-.225.176l-.564.031c-.485.029-.727.164-.727.436 0 .135.053.33.166.601 1.082 2.646 4.818 10.521 4.818 10.521l2.681-5.476-2.007-4.218c-.253-.543-.489-.993-.71-1.1-.213-.109-.553-.17-1.024-.184-.127-.003-.19-.06-.19-.17v-.46l.048-.044h4.657l.05.044v.434c0 .119-.074.176-.222.176l-.387.02c-.485.029-.749.17-.749.436 0 .135.063.33.174.601l1.807 3.887 1.81-3.674c.112-.27.174-.47.174-.601 0-.266-.238-.407-.714-.436l-.519-.02c-.149 0-.224-.057-.224-.176v-.434l.052-.044h4.024l.052.044v.46c0 .11-.062.167-.189.17-.416.014-.754.075-.972.184-.215.107-.478.557-.726 1.1l-2.205 4.436 2.695 5.502 4.593-10.595c.117-.27.172-.466.172-.601 0-.266-.22-.407-.68-.436l-.637-.02c-.15 0-.224-.057-.224-.176v-.434l.052-.044h4.04l.05.044v.46c0 .11-.063.167-.189.17-.492.014-.862.109-1.107.283-.246.174-.479.555-.701 1.139L13.878 19.05c-.395.846-.891.846-1.287 0l-2.876-5.93h-.001l2.376.001z"/></svg>
+                    </a>
+                    <a href="${linkedinSearch}" target="_blank" rel="noopener" class="person-action-icon" title="LinkedIn" onclick="event.stopPropagation();">
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+                    </a>
+                    <button class="person-action-icon" title="Modifier la fiche" onclick="event.stopPropagation(); editPersonComplete('${escapedName}', '${escapedTitle}', this)">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                    </button>
                 </div>
                 <span>${title}</span>
             </div>
@@ -486,111 +517,204 @@ function backToDashboard() {
 }
 
 // Quiz Logic
+const quizHistory = []; // { key, correct, cooldownUntil }
+let quizQuestionCount = 0;
+
+function getQuestionCooldown(questionKey) {
+    return quizHistory.find(h => h.key === questionKey);
+}
+
+function isQuestionOnCooldown(questionKey) {
+    const entry = getQuestionCooldown(questionKey);
+    if (!entry) return false;
+    return quizQuestionCount < entry.cooldownUntil;
+}
+
+function recordQuestionResult(questionKey, wasCorrect) {
+    const existing = quizHistory.findIndex(h => h.key === questionKey);
+    const cooldown = wasCorrect ? 20 : Math.floor(Math.random() * 3) + 2; // correct: 20, wrong: 2-4
+    const entry = { key: questionKey, correct: wasCorrect, cooldownUntil: quizQuestionCount + cooldown };
+
+    if (existing !== -1) {
+        quizHistory[existing] = entry;
+    } else {
+        quizHistory.push(entry);
+    }
+}
+
 function generateQuiz() {
     if (!data.departments || Object.keys(data.departments).length === 0) {
         console.warn('Cannot generate quiz: no department data');
         return;
     }
 
+    const allQuestions = [];
     const codes = Object.keys(data.departments);
-    const code = codes[Math.floor(Math.random() * codes.length)];
-    const dept = data.departments[code];
 
-    if (!dept || !dept.villes_20k || dept.villes_20k.length === 0) {
-        // Fallback for depts without cities (shouldn't happen with our data but safe)
-        generateQuiz();
-        return;
-    }
+    // Count total senators across all depts for disambiguation
+    let totalSenators = 0;
+    codes.forEach(c => { if (data.departments[c].senators) totalSenators += data.departments[c].senators.length; });
 
-    // Créer un tableau de questions beaucoup plus varié
-    const questions = [];
+    codes.forEach(code => {
+        const dept = data.departments[code];
+        if (!dept) return;
 
-    // Questions sur les villes (maires)
-    dept.villes_20k.forEach(ville => {
-        questions.push({
-            q: `Qui est le maire de ${ville.name} ?`,
-            a: ville.mayor,
-            type: 'person',
-            fullName: ville.mayor
-        });
-    });
-
-    // Questions sur le préfet
-    questions.push({
-        q: `Qui est le préfet de ${dept.name} ?`,
-        a: dept.prefect.name,
-        type: 'person',
-        fullName: dept.prefect.name
-    });
-
-    // Questions sur le président du conseil départemental
-    questions.push({
-        q: `Qui préside le conseil départemental de ${dept.name} ?`,
-        a: dept.president_conseil.name,
-        type: 'person',
-        fullName: dept.president_conseil.name
-    });
-
-    // Questions sur le président de la CDPP
-    questions.push({
-        q: `Qui préside la CDPP de ${dept.name} ?`,
-        a: dept.president_cdpp.name,
-        type: 'person',
-        fullName: dept.president_cdpp.name
-    });
-
-    // Questions sur les sénateurs
-    if (dept.senators && dept.senators.length > 0) {
-        dept.senators.forEach((senator, idx) => {
-            questions.push({
-                q: `Nommez un sénateur de ${dept.name}`,
-                a: senator.name,
-                type: 'person',
-                fullName: senator.name
+        // Questions sur les villes (maires) - seulement >= 35 000 habitants
+        if (dept.villes_20k) {
+            dept.villes_20k.forEach(ville => {
+                if (ville.pop && ville.pop < 35000) return; // Exclure < 35k
+                allQuestions.push({
+                    key: `maire_${ville.name}`,
+                    q: `Qui est le maire de ${ville.name} ?`,
+                    a: ville.mayor,
+                    type: 'person',
+                    fullName: ville.mayor
+                });
             });
-        });
-    }
 
-    // Questions sur les députés
-    if (dept.deputies && dept.deputies.length > 0) {
-        dept.deputies.forEach(deputy => {
-            questions.push({
-                q: `Qui est le député de la ${deputy.circo}ème circonscription de ${dept.name} ?`,
-                a: deputy.name,
-                type: 'person',
-                fullName: deputy.name
+            // Questions de géographie - seulement >= 35 000 habitants
+            dept.villes_20k.forEach(ville => {
+                if (ville.pop && ville.pop < 35000) return;
+                allQuestions.push({
+                    key: `dept_${ville.name}`,
+                    q: `Dans quel département se trouve la ville de ${ville.name} ?`,
+                    a: dept.name,
+                    deptCode: code,
+                    type: 'place'
+                });
             });
-        });
-    }
+        }
 
-    // Questions de géographie
-    dept.villes_20k.forEach(ville => {
-        questions.push({
-            q: `Dans quel département se trouve la ville de ${ville.name} ?`,
-            a: dept.name,
-            deptCode: code, // Ajout du code du département
-            type: 'place'
-        });
+        // Questions sur le préfet
+        if (dept.prefect) {
+            allQuestions.push({
+                key: `prefet_${code}`,
+                q: `Qui est le préfet de ${dept.name} ?`,
+                a: dept.prefect.name,
+                type: 'person',
+                fullName: dept.prefect.name
+            });
+        }
+
+        // Questions sur le président du conseil départemental
+        if (dept.president_conseil) {
+            allQuestions.push({
+                key: `pres_cd_${code}`,
+                q: `Qui préside le conseil départemental de ${dept.name} ?`,
+                a: dept.president_conseil.name,
+                type: 'person',
+                fullName: dept.president_conseil.name
+            });
+        }
+
+        // Questions sur le président de la CDPPT
+        if (dept.president_cdpp) {
+            allQuestions.push({
+                key: `pres_cdpp_${code}`,
+                q: `Qui préside la CDPPT de ${dept.name} ?`,
+                a: dept.president_cdpp.name,
+                type: 'person',
+                fullName: dept.president_cdpp.name
+            });
+        }
+
+        // Questions sur les sénateurs - préciser le département si plusieurs sénateurs dans la région
+        if (dept.senators && dept.senators.length > 0) {
+            if (totalSenators > 1) {
+                // Plusieurs sénateurs dans la région → préciser le département
+                dept.senators.forEach((senator, idx) => {
+                    allQuestions.push({
+                        key: `senateur_${code}_${idx}`,
+                        q: `Nommez un sénateur de ${dept.name}`,
+                        a: senator.name,
+                        type: 'person',
+                        fullName: senator.name,
+                        alternatives: dept.senators.map(s => s.name)
+                    });
+                });
+            } else {
+                dept.senators.forEach((senator, idx) => {
+                    allQuestions.push({
+                        key: `senateur_${code}_${idx}`,
+                        q: `Nommez un sénateur de ${dept.name}`,
+                        a: senator.name,
+                        type: 'person',
+                        fullName: senator.name,
+                        alternatives: dept.senators.map(s => s.name)
+                    });
+                });
+            }
+        }
+
+        // Questions sur les députés
+        if (dept.deputies && dept.deputies.length > 0) {
+            dept.deputies.forEach(deputy => {
+                // Question classique: qui est le député de la Xème circo ?
+                allQuestions.push({
+                    key: `depute_${code}_${deputy.circo}`,
+                    q: `Qui est le député de la ${deputy.circo}ème circonscription de ${dept.name} ?`,
+                    a: deputy.name,
+                    type: 'person',
+                    fullName: deputy.name
+                });
+                // Question inverse: de quel département est ce député ?
+                allQuestions.push({
+                    key: `depute_dept_${code}_${deputy.circo}`,
+                    q: `De quel département est le député ${deputy.name} ?`,
+                    a: dept.name,
+                    deptCode: code,
+                    type: 'place'
+                });
+            });
+        }
     });
 
-    // Questions régionales (parfois)
-    if (data.region && Math.random() > 0.7) {
-        questions.push({
-            q: `Qui préside la région PACA ?`,
-            a: data.region.president.name,
-            type: 'person',
-            fullName: data.region.president.name
-        });
-        questions.push({
-            q: `Qui est le DGS de la région PACA ?`,
-            a: data.region.dgs.name,
-            type: 'person',
-            fullName: data.region.dgs.name
-        });
+    // Questions régionales
+    if (data.region) {
+        if (data.region.president) {
+            allQuestions.push({
+                key: 'pres_region',
+                q: `Qui préside la région PACA ?`,
+                a: data.region.president.name,
+                type: 'person',
+                fullName: data.region.president.name
+            });
+        }
+        if (data.region.dgs) {
+            allQuestions.push({
+                key: 'dgs_region',
+                q: `Qui est le DGS de la région PACA ?`,
+                a: data.region.dgs.name,
+                type: 'person',
+                fullName: data.region.dgs.name
+            });
+        }
     }
 
-    // Sélectionner une question au hasard
-    currentQuestion = questions[Math.floor(Math.random() * questions.length)];
+    // Filter out questions that are on cooldown
+    const available = allQuestions.filter(q => !isQuestionOnCooldown(q.key));
+
+    if (available.length === 0) {
+        // All questions on cooldown, reset cooldowns
+        quizHistory.length = 0;
+        currentQuestion = allQuestions[Math.floor(Math.random() * allQuestions.length)];
+    } else {
+        // Prioritize questions that were answered wrong (low cooldown, closer to expiry)
+        const wrongOnes = available.filter(q => {
+            const h = getQuestionCooldown(q.key);
+            return h && !h.correct;
+        });
+
+        if (wrongOnes.length > 0 && Math.random() > 0.3) {
+            // 70% chance to prioritize a previously wrong answer
+            currentQuestion = wrongOnes[Math.floor(Math.random() * wrongOnes.length)];
+        } else {
+            currentQuestion = available[Math.floor(Math.random() * available.length)];
+        }
+    }
+
+    quizQuestionCount++;
+
     document.getElementById('quiz-question').textContent = currentQuestion.q;
     document.getElementById('quiz-input').value = '';
     document.getElementById('quiz-feedback').style.display = 'none';
@@ -602,24 +726,30 @@ function checkAnswer() {
 
     totalAsked++;
 
-    // Normalize comparison (simplified)
+    // Normalize comparison
     const normalizedInput = input.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
     const normalizedAnswer = currentQuestion.a.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
     // Pour les questions de département, accepter aussi le code (numéro)
     let isCorrect = false;
     if (currentQuestion.type === 'place' && currentQuestion.deptCode) {
-        // Accepter le nom du département OU le code
         isCorrect = (normalizedInput === normalizedAnswer || normalizedAnswer.includes(normalizedInput) && normalizedInput.length > 3) ||
             (input === currentQuestion.deptCode);
+    } else if (currentQuestion.alternatives) {
+        // Pour les sénateurs: accepter n'importe quel sénateur du département
+        isCorrect = currentQuestion.alternatives.some(alt => {
+            const normAlt = alt.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            return normalizedInput === normAlt || (normAlt.includes(normalizedInput) && normalizedInput.length > 3);
+        });
     } else {
-        // Pour les autres types de questions
-        isCorrect = normalizedInput === normalizedAnswer || normalizedAnswer.includes(normalizedInput) && normalizedInput.length > 3;
+        isCorrect = normalizedInput === normalizedAnswer || (normalizedAnswer.includes(normalizedInput) && normalizedInput.length > 3);
     }
+
+    // Record result for spaced repetition
+    recordQuestionResult(currentQuestion.key, isCorrect);
 
     if (isCorrect) {
         score++;
-        // Afficher le nom complet si c'est une personne
         if (currentQuestion.type === 'person' && currentQuestion.fullName) {
             feedback.textContent = `Correct ! Bravo. La réponse complète est : ${currentQuestion.fullName}`;
         } else if (currentQuestion.type === 'place' && currentQuestion.deptCode) {
@@ -631,6 +761,8 @@ function checkAnswer() {
     } else {
         if (currentQuestion.type === 'place' && currentQuestion.deptCode) {
             feedback.textContent = `Incorrect. La réponse était : ${currentQuestion.deptCode} - ${currentQuestion.a}`;
+        } else if (currentQuestion.alternatives) {
+            feedback.textContent = `Incorrect. Les réponses acceptées étaient : ${currentQuestion.alternatives.join(', ')}`;
         } else {
             feedback.textContent = `Incorrect. La réponse était : ${currentQuestion.a}`;
         }
@@ -782,15 +914,13 @@ function setupAuthEvents() {
         else console.warn(`Element #${id} not found for click assignment`);
     };
 
-    safeClick('to-register', () => showAuthView('register-view'));
-    safeClick('to-login-from-reg', () => showAuthView('login-view'));
-    safeClick('to-forgot', () => showAuthView('forgot-view'));
-    safeClick('to-login-from-forgot', () => showAuthView('login-view'));
+
 
     const logoutBtn = document.getElementById('logout-btn');
     if (logoutBtn) logoutBtn.onclick = () => {
         console.log('Logging out...');
         sessionStorage.removeItem('currentUser');
+        localStorage.removeItem('rememberedUser');
         currentUser = null;
         checkAuth();
     };
@@ -825,11 +955,11 @@ function setupAuthEvents() {
         const email = document.getElementById('login-email').value;
         const password = document.getElementById('login-password').value;
 
-        // Shortcut for local dev
-        if (email === 'admin' && password === 'drgpaca2026') {
-            console.log('Login: ADMIN shortcut used');
-            currentUser = { name: 'Administrateur', email: 'admin' };
-            sessionStorage.setItem('currentUser', JSON.stringify(currentUser));
+        // Admin login
+        if (email === 'drg' && password === 'paca') {
+            console.log('Login: Admin login');
+            currentUser = { name: 'Administrateur', email: 'drg' };
+            localStorage.setItem('rememberedUser', JSON.stringify(currentUser));
             checkAuth();
             return;
         }
@@ -839,11 +969,11 @@ function setupAuthEvents() {
         if (user) {
             console.log('Login: Match found');
             currentUser = user;
-            sessionStorage.setItem('currentUser', JSON.stringify(currentUser));
+            localStorage.setItem('rememberedUser', JSON.stringify(currentUser));
             checkAuth();
         } else {
             console.error('Login: Invalid credentials');
-            alert('Identifiant ou mot de passe incorrect. Assurez-vous d\'avoir créé un compte ou utilisez admin/admin.');
+            alert('Identifiant ou mot de passe incorrect.');
         }
     };
 
@@ -1045,23 +1175,37 @@ function showPersonEditModalComplete(person, personType, deptCode, personTitle) 
         return;
     }
 
-    // Pré-remplir le modal avec toutes les informations
-    // On s'assure d'afficher le nom complet (Prénom + Nom) pour l'édition
-    let displayName = person.name || '';
-    if (person.prenom && !displayName.startsWith(person.prenom)) {
-        displayName = `${person.prenom} ${displayName}`;
+    const isPersonal = (personType === 'personal');
+
+    // Show/hide the separate prenom field depending on type
+    const prenomGroup = document.getElementById('edit-person-prenom-group');
+    const nameLabel = document.getElementById('edit-person-name-label');
+
+    if (isPersonal) {
+        prenomGroup.style.display = 'block';
+        nameLabel.textContent = 'Nom';
+        document.getElementById('edit-person-prenom').value = person.prenom || '';
+        document.getElementById('edit-person-name').value = person.name || '';
+    } else {
+        prenomGroup.style.display = 'none';
+        nameLabel.textContent = 'Nom complet';
+        document.getElementById('edit-person-prenom').value = '';
+        let displayName = person.name || '';
+        if (person.prenom && !displayName.startsWith(person.prenom)) {
+            displayName = `${person.prenom} ${displayName}`;
+        }
+        document.getElementById('edit-person-name').value = displayName;
     }
-    document.getElementById('edit-person-name').value = displayName;
+
     document.getElementById('edit-person-function').value = personTitle || person.function || '';
     document.getElementById('edit-person-wiki').value = person.wiki || '';
     document.getElementById('edit-person-linkedin').value = person.linkedin || '';
     document.getElementById('edit-person-photo').value = person.photo || '';
 
-    // Ajouter des champs supplémentaires si nécessaire (parti, circonscription, etc.)
+    // Extra fields (party, circo)
     const extraFieldsContainer = document.getElementById('edit-person-extra-fields');
     if (extraFieldsContainer) {
         let extraFieldsHTML = '';
-
         if (person.party) {
             extraFieldsHTML += `
                 <div class="form-group">
@@ -1070,7 +1214,6 @@ function showPersonEditModalComplete(person, personType, deptCode, personTitle) 
                 </div>
             `;
         }
-
         if (person.circo) {
             extraFieldsHTML += `
                 <div class="form-group">
@@ -1079,18 +1222,18 @@ function showPersonEditModalComplete(person, personType, deptCode, personTitle) 
                 </div>
             `;
         }
-
         extraFieldsContainer.innerHTML = extraFieldsHTML;
     }
 
-    // Stocker le type et département pour la sauvegarde
+    // Store metadata for save
     modal.dataset.personType = personType;
     modal.dataset.deptCode = deptCode || '';
     modal.dataset.originalName = person.name;
+    modal.dataset.personId = person.id || '';
 
     modal.style.display = 'flex';
 
-    // Si il y a une URL Wikipedia, essayer de chercher la photo automatiquement si elle est manquante
+    // Auto-search photo from Wikipedia if missing
     if (person.wiki && !person.photo) {
         searchWikipediaPhoto(person.wiki);
     }
@@ -1127,10 +1270,7 @@ async function searchWikipediaPhoto(wikiUrl) {
     statusDiv.className = 'photo-search-status searching';
 
     try {
-        // Extraire le titre de la page depuis l'URL
         const pageTitle = decodeURIComponent(wikiUrl.split('/wiki/').pop());
-
-        // Utiliser l'API Wikipedia pour chercher la photo
         const apiUrl = `https://fr.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(pageTitle)}&prop=pageimages&format=json&pithumbsize=300&origin=*`;
 
         const response = await fetch(apiUrl);
@@ -1140,22 +1280,278 @@ async function searchWikipediaPhoto(wikiUrl) {
         const page = Object.values(pages)[0];
 
         if (page && page.thumbnail && page.thumbnail.source) {
-            // Convertir l'URL en format FilePath pour éviter les problèmes CORS
             const filename = page.thumbnail.source.split('/').pop().replace(/^\d+px-/, '');
             const filePathUrl = `https://commons.wikimedia.org/wiki/Special:FilePath/${filename}`;
 
             document.getElementById('edit-person-photo').value = filePathUrl;
-            statusDiv.textContent = '✅ Photo trouvée !';
+            updatePhotoPreview(filePathUrl);
+            statusDiv.textContent = '✅ Photo trouvée sur Wikipedia !';
             statusDiv.className = 'photo-search-status success';
         } else {
-            statusDiv.textContent = '⚠️ Aucune photo trouvée sur Wikipedia';
+            statusDiv.textContent = '⚠️ Aucune photo sur Wikipedia. Cliquez "Chercher des photos" ci-dessous.';
             statusDiv.className = 'photo-search-status warning';
+            // Auto-trigger image search
+            searchPersonImages();
         }
     } catch (error) {
         console.error('Error searching Wikipedia photo:', error);
-        statusDiv.textContent = '❌ Erreur lors de la recherche';
+        statusDiv.textContent = '❌ Erreur Wikipedia. Essayez "Chercher des photos".';
         statusDiv.className = 'photo-search-status error';
     }
+}
+
+function updatePhotoPreview(url) {
+    const preview = document.getElementById('edit-person-photo-preview');
+    if (preview && url) {
+        preview.src = url;
+        preview.style.display = 'block';
+        preview.onerror = () => { preview.style.display = 'none'; };
+    } else if (preview) {
+        preview.style.display = 'none';
+    }
+}
+
+async function searchPersonImages() {
+    const prenomEl = document.getElementById('edit-person-prenom');
+    const nameEl = document.getElementById('edit-person-name');
+    const prenomGroup = document.getElementById('edit-person-prenom-group');
+
+    let searchName = '';
+    if (prenomGroup && prenomGroup.style.display !== 'none' && prenomEl.value.trim()) {
+        searchName = `${prenomEl.value.trim()} ${nameEl.value.trim()}`;
+    } else {
+        searchName = nameEl.value.trim();
+    }
+
+    if (!searchName) {
+        alert('Veuillez d\'abord renseigner le nom de la personne.');
+        return;
+    }
+
+    const grid = document.getElementById('photo-picker-grid');
+    const statusDiv = document.getElementById('photo-search-status');
+
+    grid.style.display = 'block';
+    grid.innerHTML = '<div style="text-align:center; padding:1.5rem; color:var(--text-dim);"><div class="spinner" style="display:inline-block; width:24px; height:24px; border:2.5px solid rgba(255,255,255,0.15); border-top-color:#7c3aed; border-radius:50%; animation:spin 0.8s linear infinite;"></div><br><span style="font-size:0.85rem;">Recherche en cours...</span></div>';
+    statusDiv.textContent = `🔍 Recherche de photos pour "${searchName}"...`;
+    statusDiv.className = 'photo-search-status searching';
+
+    const imageResults = [];
+
+    try {
+        const [wikiImages, wikiEnImages, commonsImages, wikidataImages, googleImages] = await Promise.allSettled([
+            fetchWikipediaImages(searchName, 'fr'),
+            fetchWikipediaImages(searchName, 'en'),
+            fetchCommonsImages(searchName),
+            fetchWikidataImage(searchName),
+            fetchGoogleImages(searchName)
+        ]);
+
+        if (wikiImages.status === 'fulfilled') imageResults.push(...wikiImages.value);
+        if (wikiEnImages.status === 'fulfilled') imageResults.push(...wikiEnImages.value);
+        if (commonsImages.status === 'fulfilled') imageResults.push(...commonsImages.value);
+        if (wikidataImages.status === 'fulfilled' && wikidataImages.value) imageResults.push(wikidataImages.value);
+        if (googleImages.status === 'fulfilled') imageResults.push(...googleImages.value);
+    } catch (error) {
+        console.error('Image search error:', error);
+    }
+
+    // Deduplicate by URL
+    const uniqueUrls = new Set();
+    const uniqueResults = imageResults.filter(img => {
+        if (uniqueUrls.has(img.url)) return false;
+        uniqueUrls.add(img.url);
+        return true;
+    });
+
+    // Build the grid
+    if (uniqueResults.length > 0) {
+        statusDiv.textContent = `✅ ${uniqueResults.length} photo(s) trouvée(s). Cliquez pour sélectionner.`;
+        statusDiv.className = 'photo-search-status success';
+
+        let html = '<div class="photo-picker-items">';
+        uniqueResults.forEach(img => {
+            html += `
+                <div class="photo-picker-item" onclick="selectPickerPhoto('${img.url.replace(/'/g, "\\'")}', this)" title="${(img.title || '').replace(/"/g, '&quot;')}">
+                    <img src="${img.thumb}" alt="${(img.title || '').replace(/"/g, '&quot;')}" 
+                         onerror="this.parentElement.style.display='none'">
+                    <div class="photo-picker-source">${img.source}</div>
+                </div>
+            `;
+        });
+        html += '</div>';
+        grid.innerHTML = html;
+    } else {
+        statusDiv.textContent = '⚠️ Aucune photo trouvée.';
+        statusDiv.className = 'photo-search-status warning';
+        grid.innerHTML = `
+            <div style="text-align:center; padding:1rem;">
+                <p style="color:var(--text-dim); margin-bottom:0.5rem;">Aucun résultat trouvé.</p>
+                <p style="color:var(--text-dim); font-size:0.75rem;">Vous pouvez saisir directement une URL dans le champ Photo ci-dessus.</p>
+            </div>
+        `;
+    }
+}
+
+async function fetchGoogleImages(searchName) {
+    const images = [];
+    try {
+        const resp = await fetch(`/api/google-images?q=${encodeURIComponent(searchName)}`);
+
+        if (!resp.ok) {
+            console.warn('Google Images API returned', resp.status);
+            return images;
+        }
+
+        const data = await resp.json();
+
+        if (data.success && data.images) {
+            data.images.forEach(img => {
+                images.push({
+                    url: img.url,
+                    thumb: img.url,
+                    title: searchName,
+                    source: 'Google'
+                });
+            });
+        }
+    } catch (err) {
+        console.warn('Google image search failed:', err);
+    }
+    return images;
+}
+
+async function fetchWikipediaImages(searchName, lang) {
+    const images = [];
+
+    const searchUrl = `https://${lang}.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(searchName)}&srnamespace=0&srlimit=3&format=json&origin=*`;
+    const searchResp = await fetch(searchUrl);
+    const searchData = await searchResp.json();
+
+    if (!searchData.query || !searchData.query.search || searchData.query.search.length === 0) return images;
+
+    const titles = searchData.query.search.map(s => s.title).join('|');
+    const imgUrl = `https://${lang}.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(titles)}&prop=pageimages&format=json&pithumbsize=200&origin=*`;
+    const imgResp = await fetch(imgUrl);
+    const imgData = await imgResp.json();
+
+    if (imgData.query && imgData.query.pages) {
+        for (const page of Object.values(imgData.query.pages)) {
+            if (page.thumbnail && page.thumbnail.source) {
+                const filename = page.thumbnail.source.split('/').pop().replace(/^\d+px-/, '');
+                const fullUrl = `https://commons.wikimedia.org/wiki/Special:FilePath/${filename}`;
+                images.push({
+                    url: fullUrl,
+                    thumb: page.thumbnail.source,
+                    title: page.title,
+                    source: `Wiki ${lang.toUpperCase()}`
+                });
+            }
+        }
+    }
+
+    return images;
+}
+
+async function fetchCommonsImages(searchName) {
+    const images = [];
+
+    const url = `https://commons.wikimedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(searchName)}&srnamespace=6&srlimit=10&format=json&origin=*`;
+    const resp = await fetch(url);
+    const respData = await resp.json();
+
+    if (!respData.query || !respData.query.search) return images;
+
+    const imageFiles = respData.query.search
+        .filter(s => /\.(jpg|jpeg|png|webp)$/i.test(s.title))
+        .slice(0, 8);
+
+    if (imageFiles.length === 0) return images;
+
+    const titles = imageFiles.map(f => f.title).join('|');
+    const thumbUrl = `https://commons.wikimedia.org/w/api.php?action=query&titles=${encodeURIComponent(titles)}&prop=imageinfo&iiprop=url|extmetadata&iiurlwidth=200&format=json&origin=*`;
+    const thumbResp = await fetch(thumbUrl);
+    const thumbData = await thumbResp.json();
+
+    if (thumbData.query && thumbData.query.pages) {
+        for (const page of Object.values(thumbData.query.pages)) {
+            if (page.imageinfo && page.imageinfo[0]) {
+                const info = page.imageinfo[0];
+                const thumbSrc = info.thumburl || info.url;
+                const fullUrl = info.url;
+
+                images.push({
+                    url: fullUrl,
+                    thumb: thumbSrc,
+                    title: page.title.replace('File:', '').replace(/_/g, ' '),
+                    source: 'Commons'
+                });
+            }
+        }
+    }
+
+    return images;
+}
+
+async function fetchWikidataImage(searchName) {
+    try {
+        // Search Wikidata for the person
+        const searchUrl = `https://www.wikidata.org/w/api.php?action=wbsearchentities&search=${encodeURIComponent(searchName)}&language=fr&limit=1&format=json&origin=*`;
+        const searchResp = await fetch(searchUrl);
+        const searchData = await searchResp.json();
+
+        if (!searchData.search || searchData.search.length === 0) return null;
+
+        const entityId = searchData.search[0].id;
+
+        // Get image property (P18) from the entity
+        const entityUrl = `https://www.wikidata.org/w/api.php?action=wbgetclaims&entity=${entityId}&property=P18&format=json&origin=*`;
+        const entityResp = await fetch(entityUrl);
+        const entityData = await entityResp.json();
+
+        if (entityData.claims && entityData.claims.P18 && entityData.claims.P18.length > 0) {
+            const filename = entityData.claims.P18[0].mainsnak.datavalue.value;
+            const encodedFilename = encodeURIComponent(filename.replace(/ /g, '_'));
+            const thumbUrl = `https://commons.wikimedia.org/w/api.php?action=query&titles=File:${encodedFilename}&prop=imageinfo&iiprop=url&iiurlwidth=200&format=json&origin=*`;
+            const thumbResp = await fetch(thumbUrl);
+            const thumbData = await thumbResp.json();
+
+            let thumb = `https://commons.wikimedia.org/wiki/Special:FilePath/${encodedFilename}?width=200`;
+            if (thumbData.query && thumbData.query.pages) {
+                const page = Object.values(thumbData.query.pages)[0];
+                if (page && page.imageinfo && page.imageinfo[0] && page.imageinfo[0].thumburl) {
+                    thumb = page.imageinfo[0].thumburl;
+                }
+            }
+
+            return {
+                url: `https://commons.wikimedia.org/wiki/Special:FilePath/${encodedFilename}`,
+                thumb: thumb,
+                title: searchData.search[0].label || searchName,
+                source: 'Wikidata'
+            };
+        }
+    } catch (err) {
+        console.warn('Wikidata image search failed:', err);
+    }
+    return null;
+}
+
+function selectPickerPhoto(url, el) {
+    document.getElementById('edit-person-photo').value = url;
+    updatePhotoPreview(url);
+
+    // Visual feedback: highlight selected
+    document.querySelectorAll('.photo-picker-item').forEach(item => item.classList.remove('selected'));
+    if (el) el.classList.add('selected');
+
+    // Hide paste preview if visible
+    const pastePreview = document.getElementById('paste-preview-container');
+    if (pastePreview) pastePreview.style.display = 'none';
+
+    const statusDiv = document.getElementById('photo-search-status');
+    statusDiv.textContent = '✅ Photo sélectionnée ! Cliquez "Enregistrer" pour confirmer.';
+    statusDiv.className = 'photo-search-status success';
 }
 
 function closePersonEditModal() {
@@ -1345,7 +1741,6 @@ function savePersonEdit() {
 
     // Vérifier dans Ma Fiche Personnelle (nouveau)
     if (!personFound) {
-        // On cherche par ID si possible, sinon par nom
         const personId = modal.dataset.personId;
 
         let pIndex = -1;
@@ -1355,27 +1750,32 @@ function savePersonEdit() {
             // Fallback par nom original
             pIndex = personalData.findIndex(p => {
                 const fullname = `${p.prenom ? p.prenom + ' ' : ''}${p.name}`;
-                return fullname === originalName;
+                return fullname === originalName || p.name === originalName;
             });
         }
 
         if (pIndex !== -1) {
-            // Mise à jour
             const p = personalData[pIndex];
 
-            // Mise à jour de Prénom et Nom depuis le champ unique "name" (Full Name)
-            const inputFullName = name.trim();
-            const lastSpace = inputFullName.lastIndexOf(' ');
-
-            if (lastSpace > 0) {
-                p.prenom = inputFullName.substring(0, lastSpace);
-                p.name = inputFullName.substring(lastSpace + 1);
+            // Use separate fields for personal contacts
+            const prenomInput = document.getElementById('edit-person-prenom');
+            if (prenomInput && document.getElementById('edit-person-prenom-group').style.display !== 'none') {
+                p.prenom = prenomInput.value.trim();
+                p.name = name.trim();
             } else {
-                p.prenom = '';
-                p.name = inputFullName;
+                // Fallback: split full name
+                const inputFullName = name.trim();
+                const lastSpace = inputFullName.lastIndexOf(' ');
+                if (lastSpace > 0) {
+                    p.prenom = inputFullName.substring(0, lastSpace);
+                    p.name = inputFullName.substring(lastSpace + 1);
+                } else {
+                    p.prenom = '';
+                    p.name = inputFullName;
+                }
             }
 
-            p.function = personFunction || p.function;
+            p.function = personFunction;
             p.wiki = wiki;
             p.linkedin = linkedin;
             p.photo = photo;
@@ -1383,9 +1783,9 @@ function savePersonEdit() {
             localStorage.setItem('personalData', JSON.stringify(personalData));
             personFound = true;
 
-            // Re-render systématique et arrêt pour rester sur la fiche perso
             renderPersonalList();
             closePersonEditModal();
+            alert('✅ Contact mis à jour !');
             return;
         }
     }
@@ -1466,74 +1866,68 @@ function renderPersonalList() {
     if (!container) return;
     container.innerHTML = '';
 
-    // Bouton de secours
-    if (personalData && personalData.length > 0) {
-        const headerDiv = document.createElement('div');
-        headerDiv.style.gridColumn = '1/-1';
-        headerDiv.style.textAlign = 'right';
-        headerDiv.style.marginBottom = '1rem';
-        headerDiv.innerHTML = `<button onclick="if(confirm('Tout supprimer ?')) { personalData=[]; localStorage.setItem('personalData', '[]'); renderPersonalList(); }" style="color:#ff6b6b; border:1px solid #ff6b6b; background:none; padding:0.5rem; border-radius:4px; cursor:pointer;">⚠️ Vider ma liste</button>`;
-        container.appendChild(headerDiv);
-    }
-
     if (personalData.length === 0) {
-        container.innerHTML = `<p style="grid-column: 1/-1; text-align: center; color: var(--text-dim); font-style: italic;">Aucun contact pour le moment.</p>`;
+        container.innerHTML = `<p style="text-align: center; color: var(--text-dim); font-style: italic;">Aucun contact pour le moment.</p>`;
         return;
     }
 
+    // "Clear all" button
+    const headerDiv = document.createElement('div');
+    headerDiv.style.textAlign = 'right';
+    headerDiv.style.marginBottom = '1rem';
+    headerDiv.innerHTML = `<button onclick="if(confirm('Tout supprimer ?')) { personalData=[]; localStorage.setItem('personalData', '[]'); renderPersonalList(); }" style="color:#ff6b6b; border:1px solid #ff6b6b; background:none; padding:0.4rem 0.8rem; border-radius:6px; cursor:pointer; font-size:0.8rem;">⚠️ Vider ma liste</button>`;
+    container.appendChild(headerDiv);
+
+    // Build table
+    const table = document.createElement('table');
+    table.className = 'personal-contacts-table';
+    table.innerHTML = `
+        <thead>
+            <tr>
+                <th>Nom</th>
+                <th>Prénom</th>
+                <th>Fonction</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    `;
+
+    const tbody = table.querySelector('tbody');
+
     personalData.forEach(p => {
         const fullname = `${p.prenom ? p.prenom + ' ' : ''}${p.name}`;
-        const photoUrl = p.photo || 'broken';
+        const escapedName = fullname.replace(/'/g, "\\'");
+        const escapedFunc = p.function ? p.function.replace(/'/g, "\\'") : '';
+        const wikiUrl = p.wiki || '';
+        const linkedinSearch = `https://www.linkedin.com/search/results/all/?keywords=${encodeURIComponent(fullname)}`;
 
-        const card = document.createElement('div');
-        card.className = 'glass';
-        card.style.padding = '1rem';
-        card.style.position = 'relative';
-
-        card.innerHTML = `
-            <div style="display:flex; align-items:center; gap:1rem;">
-                <div class="person-photo-container">
-                    <img src="${photoUrl}" 
-                         class="person-photo ${!p.photo ? 'broken' : ''}" 
-                         alt="${fullname}"
-                         onerror="this.classList.add('broken'); this.src='data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'">
-                </div>
-                <div style="flex: 1;">
-                    <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-                        <div style="font-weight:bold; font-size:1.1rem; cursor:pointer;" 
-                             onclick="editPersonComplete('${fullname.replace(/'/g, "\\'")}', '${p.function.replace(/'/g, "\\'")}', this); document.getElementById('edit-person-modal').dataset.personId = '${p.id}'"
-                             title="Éditer / Voir">
-                            ${fullname}
-                        </div>
-                        <button onclick="event.stopPropagation(); window.speak('${fullname.replace(/'/g, "\\'")}. ${p.function ? p.function.replace(/'/g, "\\'") : ''}')"
-                                style="background:none; border:none; cursor:pointer; font-size:1.2rem; margin-left:0.5rem;"
-                                title="Écouter">
-                            🔊
-                        </button>
-                    </div>
-                    <div style="font-size:0.9rem; color:var(--text-dim); margin-top:0.2rem;">${p.function}</div>
-                </div>
-            </div>
-            
-            <div style="margin-top:0.8rem; display:flex; justify-content:space-between; align-items:center;">
-                <div style="font-size:0.8rem;">
-                    ${p.wiki ? `<a href="${p.wiki}" target="_blank" style="font-size:0.8rem;">Wiki</a>` : '<span style="font-size:0.8rem; opacity:0.5;">Wiki</span>'}
-                </div>
-                <div style="display:flex; gap:0.5rem;">
-                    <button type="button" onclick="event.preventDefault(); event.stopPropagation(); removePersonalContact('${p.id}')"
-                            style="font-size:0.75rem; padding:0.2rem 0.6rem; background:rgba(220,50,50,0.9); color:white; border:none; border-radius:4px; cursor:pointer;"
-                            title="Supprimer ce contact">
-                        🗑️ Supprimer
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td class="col-name"><strong>${p.name || ''}</strong></td>
+            <td class="col-prenom">${p.prenom || ''}</td>
+            <td class="col-function">${p.function || ''}</td>
+            <td class="col-actions">
+                <div class="person-actions">
+                    <a href="${wikiUrl}" target="_blank" rel="noopener" class="person-action-icon ${!wikiUrl ? 'disabled' : ''}" title="Wikipedia" onclick="event.stopPropagation(); ${!wikiUrl ? 'event.preventDefault();' : ''}">
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.09 13.119c-.936 1.932-2.217 4.548-2.853 5.728-.616 1.074-1.127.931-1.532.029-1.406-3.321-4.293-9.144-5.651-12.409-.251-.601-.441-.987-.619-1.139-.181-.15-.554-.24-1.122-.271C.103 5.033 0 4.982 0 4.898v-.455l.052-.045c.924-.005 5.401 0 5.401 0l.051.045v.434c0 .119-.075.176-.225.176l-.564.031c-.485.029-.727.164-.727.436 0 .135.053.33.166.601 1.082 2.646 4.818 10.521 4.818 10.521l2.681-5.476-2.007-4.218c-.253-.543-.489-.993-.71-1.1-.213-.109-.553-.17-1.024-.184-.127-.003-.19-.06-.19-.17v-.46l.048-.044h4.657l.05.044v.434c0 .119-.074.176-.222.176l-.387.02c-.485.029-.749.17-.749.436 0 .135.063.33.174.601l1.807 3.887 1.81-3.674c.112-.27.174-.47.174-.601 0-.266-.238-.407-.714-.436l-.519-.02c-.149 0-.224-.057-.224-.176v-.434l.052-.044h4.024l.052.044v.46c0 .11-.062.167-.189.17-.416.014-.754.075-.972.184-.215.107-.478.557-.726 1.1l-2.205 4.436 2.695 5.502 4.593-10.595c.117-.27.172-.466.172-.601 0-.266-.22-.407-.68-.436l-.637-.02c-.15 0-.224-.057-.224-.176v-.434l.052-.044h4.04l.05.044v.46c0 .11-.063.167-.189.17-.492.014-.862.109-1.107.283-.246.174-.479.555-.701 1.139L13.878 19.05c-.395.846-.891.846-1.287 0l-2.876-5.93h-.001l2.376.001z"/></svg>
+                    </a>
+                    <a href="${linkedinSearch}" target="_blank" rel="noopener" class="person-action-icon" title="LinkedIn" onclick="event.stopPropagation();">
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+                    </a>
+                    <button class="person-action-icon" title="Modifier" onclick="event.stopPropagation(); editPersonComplete('${escapedName}', '${escapedFunc}', this)">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                     </button>
-                    <button onclick="autoFillMissingInfo('${fullname.replace(/'/g, "\\'")}', ${p.id}).then(() => { localStorage.setItem('personalData', JSON.stringify(personalData)); renderPersonalList(); })" 
-                            style="font-size:0.75rem; padding:0.2rem 0.6rem; background:rgba(255,255,255,0.1); border:none; border-radius:4px; cursor:pointer;">
-                        🔄 Actualiser
+                    <button class="person-action-icon" title="Supprimer" onclick="event.preventDefault(); event.stopPropagation(); removePersonalContact('${p.id}')" style="color: #ff6b6b;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
                     </button>
                 </div>
-            </div>
+            </td>
         `;
-        container.appendChild(card);
+        tbody.appendChild(tr);
     });
+
+    container.appendChild(table);
 }
 
 function removePersonalContact(idArg) {
@@ -1691,8 +2085,13 @@ function createEditPersonModal() {
                 </div>
             </div>
             <div class="modal-body">
+                <div id="edit-person-prenom-group" class="form-group" style="margin-bottom: 1rem; display: none;">
+                    <label style="display:block; margin-bottom:0.5rem; color:var(--text-dim);">Prénom</label>
+                    <input type="text" id="edit-person-prenom" placeholder="Prénom" style="width:100%; padding:0.5rem; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); color:white; border-radius:4px;">
+                </div>
+
                 <div class="form-group" style="margin-bottom: 1rem;">
-                    <label style="display:block; margin-bottom:0.5rem; color:var(--text-dim);">Nom complet</label>
+                    <label id="edit-person-name-label" style="display:block; margin-bottom:0.5rem; color:var(--text-dim);">Nom complet</label>
                     <input type="text" id="edit-person-name" style="width:100%; padding:0.5rem; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); color:white; border-radius:4px;">
                 </div>
 
@@ -1720,13 +2119,20 @@ function createEditPersonModal() {
                 </div>
 
                 <div class="form-group" style="margin-bottom: 1rem;">
-                    <label style="display:block; margin-bottom:0.5rem; color:var(--text-dim);">URL de la photo</label>
-                    <div style="display: flex; gap: 0.5rem;">
+                    <label style="display:block; margin-bottom:0.5rem; color:var(--text-dim);">Photo</label>
+                    <div style="display: flex; gap: 0.5rem; align-items: center;">
                         <input type="url" id="edit-person-photo" placeholder="https://..." style="flex: 1; padding:0.5rem; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); color:white; border-radius:4px;">
+                        <img id="edit-person-photo-preview" src="" alt="" style="width:36px; height:36px; border-radius:50%; object-fit:cover; border:1.5px solid rgba(255,255,255,0.2); display:none;">
                         <button onclick="const url = document.getElementById('edit-person-photo').value; if(url) window.open(url, '_blank')" 
                                 title="Voir la photo" style="padding: 0.5rem; background: rgba(255,255,255,0.2); border: none; border-radius: 4px; cursor: pointer;">🖼️</button>
                     </div>
                     <div id="photo-search-status" class="photo-search-status" style="margin-top: 0.5rem; font-size: 0.8rem;"></div>
+                    <button onclick="searchPersonImages()" type="button"
+                            style="margin-top:0.5rem; width:100%; padding:0.6rem; background:linear-gradient(135deg, #4f46e5, #7c3aed); color:white; border:none; border-radius:6px; cursor:pointer; font-size:0.85rem; transition: opacity 0.2s;"
+                            onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">
+                        🔍 Chercher des photos
+                    </button>
+                    <div id="photo-picker-grid" class="photo-picker-grid" style="display:none;"></div>
                 </div>
                 
                 <!-- Conteneur pour les champs supplémentaires (parti, circo, etc.) -->
@@ -1743,6 +2149,63 @@ function createEditPersonModal() {
 
 init();
 
+// ===== Photo Zoom Modal =====
+function openPhotoModal(imgSrc, personName) {
+    const overlay = document.getElementById('photo-modal');
+    const modalImg = document.getElementById('photo-modal-img');
+    const modalName = document.getElementById('photo-modal-name');
+    modalImg.src = imgSrc;
+    modalImg.alt = personName || '';
+    modalName.textContent = personName || '';
+    // Small delay so CSS transition triggers properly
+    requestAnimationFrame(() => {
+        overlay.classList.add('active');
+    });
+    document.body.style.overflow = 'hidden';
+}
+
+function closePhotoModal(event) {
+    if (event) {
+        // Only close when clicking the overlay background or the close button, not the content
+        const content = document.querySelector('.photo-modal-content');
+        if (event.target !== document.getElementById('photo-modal') &&
+            !event.target.classList.contains('photo-modal-close') &&
+            content && content.contains(event.target)) {
+            return;
+        }
+        event.stopPropagation();
+    }
+    const overlay = document.getElementById('photo-modal');
+    overlay.classList.remove('active');
+    document.body.style.overflow = '';
+}
+
+// Event delegation (capture phase): click on any person-photo that isn't broken
+// Using capture phase to intercept before inline onclick on parent elements
+document.body.addEventListener('click', function (e) {
+    const img = e.target.closest('img.person-photo:not(.broken)');
+    if (!img) return;
+    // Don't open modal for tiny broken placeholder images
+    if (img.naturalWidth === 0) return;
+
+    e.stopPropagation();
+    e.stopImmediatePropagation();
+    e.preventDefault();
+
+    const personName = img.alt || '';
+    openPhotoModal(img.src, personName);
+}, true);
+
+// Close on Escape key
+document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') {
+        const overlay = document.getElementById('photo-modal');
+        if (overlay && overlay.classList.contains('active')) {
+            closePhotoModal();
+        }
+    }
+});
+
 // Exposer les fonctions dans l'espace global pour les onclick HTML (nécessaire car type="module")
 window.showFiche = showFiche;
 window.showRegionFiche = showRegionFiche;
@@ -1756,6 +2219,10 @@ window.addPersonalContact = addPersonalContact;
 window.removePersonalContact = removePersonalContact;
 window.autoFillMissingInfo = autoFillMissingInfo;
 window.autoCompleteAll = autoCompleteAll;
+window.searchPersonImages = searchPersonImages;
+window.selectPickerPhoto = selectPickerPhoto;
+window.openPhotoModal = openPhotoModal;
+window.closePhotoModal = closePhotoModal;
 
 // Events Personal
 const personalBtn = document.getElementById('personal-search-btn');
@@ -1769,3 +2236,61 @@ if (backPersonalBtn) backPersonalBtn.onclick = backToDashboard;
 
 const autoCompleteBtn = document.getElementById('auto-complete-all-btn');
 if (autoCompleteBtn) autoCompleteBtn.onclick = autoCompleteAll;
+
+// ── Burger Menu / Side Drawer ──────────────────────────────
+(function initDrawer() {
+    const burgerToggle = document.getElementById('burger-toggle');
+    const drawer = document.getElementById('side-drawer');
+    const overlay = document.getElementById('drawer-overlay');
+    const closeBtn = document.getElementById('drawer-close');
+
+    if (!burgerToggle || !drawer || !overlay) return;
+
+    function openDrawer() {
+        drawer.classList.add('open');
+        overlay.classList.add('visible');
+        burgerToggle.classList.add('open');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeDrawer() {
+        drawer.classList.remove('open');
+        overlay.classList.remove('visible');
+        burgerToggle.classList.remove('open');
+        document.body.style.overflow = '';
+    }
+
+    burgerToggle.addEventListener('click', () => {
+        drawer.classList.contains('open') ? closeDrawer() : openDrawer();
+    });
+
+    overlay.addEventListener('click', closeDrawer);
+    if (closeBtn) closeBtn.addEventListener('click', closeDrawer);
+
+    // Wire drawer buttons to the same actions as header buttons
+    const wire = (drawerId, action) => {
+        const el = document.getElementById(drawerId);
+        if (el) el.addEventListener('click', () => {
+            closeDrawer();
+            action();
+        });
+    };
+
+    wire('drawer-refresh-btn', refreshData);
+    wire('drawer-personal-btn', showPersonalView);
+    wire('drawer-region-btn', showRegionFiche);
+    wire('drawer-marseille-btn', showMarseilleFiche);
+    wire('drawer-logout-btn', () => {
+        sessionStorage.removeItem('currentUser');
+        localStorage.removeItem('rememberedUser');
+        currentUser = null;
+        checkAuth();
+    });
+
+    // Close drawer on Escape key
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && drawer.classList.contains('open')) {
+            closeDrawer();
+        }
+    });
+})();

@@ -15,58 +15,46 @@
       <h2 class="logo" style="text-align: center; margin-bottom: 2rem;">Carnet des savoirs</h2>
       <h3>Connexion</h3>
       <form id="login-form">
-        <input type="text" id="login-email" class="quiz-input" placeholder="Email ou Identifiant" required>
+        <input type="text" id="login-email" class="quiz-input" placeholder="Identifiant" required>
         <input type="password" id="login-password" class="quiz-input" placeholder="Mot de passe" required>
         <button type="submit" class="quiz-btn" style="width: 100%;">Se connecter</button>
       </form>
-      <p style="margin-top: 1.5rem; text-align: center; font-size: 0.9rem;">
-        <a href="#" id="to-forgot">Mot de passe oublié ?</a><br>
-        Pas encore de compte ? <a href="#" id="to-register">S'inscrire</a>
-      </p>
-    </div>
-
-    <!-- Register View -->
-    <div id="register-view" class="glass auth-box" style="display: none;">
-      <h2 class="logo" style="text-align: center; margin-bottom: 2rem;">Carnet des savoirs</h2>
-      <h3>Inscription</h3>
-      <form id="register-form">
-        <input type="text" id="register-name" class="quiz-input" placeholder="Nom complet" required>
-        <input type="text" id="register-email" class="quiz-input" placeholder="Email ou Identifiant" required>
-        <input type="password" id="register-password" class="quiz-input" placeholder="Mot de passe" required>
-        <button type="submit" class="quiz-btn" style="width: 100%;">S'inscrire</button>
-      </form>
-      <p style="margin-top: 1.5rem; text-align: center; font-size: 0.9rem;">
-        Déjà un compte ? <a href="#" id="to-login-from-reg">Se connecter</a>
-      </p>
-    </div>
-
-    <!-- Forgot Password View -->
-    <div id="forgot-view" class="glass auth-box" style="display: none;">
-      <h2 class="logo" style="text-align: center; margin-bottom: 2rem;">Carnet des savoirs</h2>
-      <h3>Récupération</h3>
-      <p style="font-size: 0.9rem; color: var(--text-dim); margin-bottom: 1rem;">Entrez votre email pour recevoir un
-        lien de réinitialisation.</p>
-      <form id="forgot-form">
-        <input type="text" id="forgot-email" class="quiz-input" placeholder="Email ou Identifiant" required>
-        <button type="submit" class="quiz-btn" style="width: 100%;">Envoyer le lien</button>
-      </form>
-      <p style="margin-top: 1.5rem; text-align: center; font-size: 0.9rem;">
-        <a href="#" id="to-login-from-forgot">Retour à la connexion</a>
-      </p>
     </div>
   </div>
 
   <div id="app" style="display: none;">
     <header>
+      <button id="burger-toggle" class="burger-toggle" aria-label="Menu">
+        <span class="burger-bar"></span>
+        <span class="burger-bar"></span>
+        <span class="burger-bar"></span>
+      </button>
       <h1 class="logo">Carnet des savoirs</h1>
-      <div style="display: flex; gap: 1rem;">
+      <nav class="nav-desktop">
         <button id="refresh-data-btn" class="back-btn" title="Mettre à jour les données">🔄 Actualiser</button>
         <button id="personal-search-btn" class="back-btn">👤 Ma Fiche</button>
         <button id="region-btn" class="back-btn">Fiche Régionale</button>
         <button id="marseille-btn" class="back-btn">📍 Marseille</button>
         <button id="logout-btn" class="back-btn">Déconnexion</button>
-      </div>
+      </nav>
     </header>
+
+    <!-- Mobile Side Drawer -->
+    <div id="drawer-overlay" class="drawer-overlay"></div>
+    <aside id="side-drawer" class="side-drawer glass">
+      <div class="drawer-header">
+        <span class="drawer-title">Menu</span>
+        <button id="drawer-close" class="drawer-close" aria-label="Fermer">✕</button>
+      </div>
+      <nav class="drawer-nav">
+        <button id="drawer-refresh-btn" class="drawer-link">🔄 Actualiser les données</button>
+        <button id="drawer-personal-btn" class="drawer-link">👤 Ma Fiche</button>
+        <button id="drawer-region-btn" class="drawer-link">🏛️ Fiche Régionale</button>
+        <button id="drawer-marseille-btn" class="drawer-link">📍 Marseille</button>
+        <div class="drawer-divider"></div>
+        <button id="drawer-logout-btn" class="drawer-link drawer-link--danger">🚪 Déconnexion</button>
+      </nav>
+    </aside>
 
     <!-- Dashboard View -->
     <main id="dashboard" class="dashboard">
@@ -104,7 +92,7 @@
       <div class="info-grid">
         <!-- Executif -->
         <section class="info-section">
-          <h4>Exécutif</h4>
+          <h4>Institutionnels</h4>
           <div id="fiche-prefect" class="person-card"></div>
           <div id="fiche-pres-conseil" class="person-card"></div>
           <div id="fiche-pres-cdpp" class="person-card"></div>
@@ -146,7 +134,7 @@
       <div class="info-grid">
         <!-- Executif Régional -->
         <section class="info-section">
-          <h4>Exécutif Régional</h4>
+          <h4>Institutionnels</h4>
           <div id="region-president-container" style="margin-bottom: 1rem;"></div>
           <div style="margin-top:  1.5rem;">
             <p style="font-size: 0.9rem; color: var(--text-dim);">Directeur Général des Services :</p>
@@ -272,13 +260,21 @@
 
         <section class="glass" style="margin-top: 2rem; padding: 1.5rem;">
           <h4 style="margin-bottom: 1rem;">Mes Contacts</h4>
-          <div id="personal-list-container"
-            style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1rem;">
+          <div id="personal-list-container">
             <p style="grid-column: 1/-1; text-align: center; color: var(--text-dim); font-style: italic;">Aucun contact
               pour le moment.</p>
           </div>
         </section>
       </div>
+    </div>
+  </div>
+
+  <!-- Photo Zoom Modal -->
+  <div id="photo-modal" class="photo-modal-overlay" onclick="closePhotoModal(event)">
+    <div class="photo-modal-content">
+      <button class="photo-modal-close" onclick="closePhotoModal(event)" title="Fermer">&times;</button>
+      <img id="photo-modal-img" src="" alt="">
+      <p id="photo-modal-name" class="photo-modal-name"></p>
     </div>
   </div>
 
