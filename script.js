@@ -1,7 +1,7 @@
 let data = {};
 let marseilleData = null;
 
-let personalData = JSON.parse(localStorage.getItem('personalData') || '[]');
+
 let users = JSON.parse(localStorage.getItem('carnetUsers') || '[]');
 let currentUser = JSON.parse(localStorage.getItem('rememberedUser') || sessionStorage.getItem('currentUser') || 'null');
 let currentDept = null;
@@ -1541,17 +1541,6 @@ function editPersonComplete(personName, personTitle, buttonElement) {
         }
     }
 
-    // Vérifier dans Ma Fiche Personnelle
-    let isPersonal = false;
-    if (!person) {
-        const p = personalData.find(x => `${x.prenom ? x.prenom + ' ' : ''}${x.name}` === personName);
-        if (p) {
-            person = p;
-            personType = 'personal';
-            isPersonal = true;
-        }
-    }
-
     if (!person) {
         alert('❌ Personne non trouvée dans les données');
         return;
@@ -1559,35 +1548,6 @@ function editPersonComplete(personName, personTitle, buttonElement) {
 
     // Ouvrir le modal avec toutes les informations
     showPersonEditModalComplete(person, personType, deptCode, personTitle);
-
-    // Ajouter bouton supprimer pour fiche perso
-    setTimeout(() => {
-        const modalEl = document.getElementById('edit-person-modal');
-        if (!modalEl) return;
-        const footer = modalEl.querySelector('.modal-footer');
-        if (!footer) return;
-
-        const oldBtn = document.getElementById('modal-delete-personal-btn');
-        if (oldBtn) oldBtn.remove();
-
-        if (isPersonal) {
-            const btn = document.createElement('button');
-            btn.id = 'modal-delete-personal-btn';
-            btn.innerHTML = '🗑️ Supprimer';
-            btn.className = 'btn-secondary';
-            btn.style.backgroundColor = '#ff4444';
-            btn.style.color = 'white';
-            btn.style.marginRight = 'auto';
-            btn.type = 'button';
-            btn.onclick = (e) => {
-                e.preventDefault();
-                // Suppression directe via la fonction robuste
-                removePersonalContact(person.id);
-                closePersonEditModal();
-            };
-            footer.insertBefore(btn, footer.firstChild);
-        }
-    }, 50);
 }
 
 function showPersonEditModalComplete(person, personType, deptCode, personTitle) {
@@ -2227,63 +2187,10 @@ function savePersonEdit() {
     }
 
 
-    // Vérifier dans Ma Fiche Personnelle (nouveau)
-    if (!personFound) {
-        const personId = modal.dataset.personId;
-
-        let pIndex = -1;
-        if (personId) {
-            pIndex = personalData.findIndex(p => p.id == personId);
-        } else {
-            // Fallback par nom original
-            pIndex = personalData.findIndex(p => {
-                const fullname = `${p.prenom ? p.prenom + ' ' : ''}${p.name}`;
-                return fullname === originalName || p.name === originalName;
-            });
-        }
-
-        if (pIndex !== -1) {
-            const p = personalData[pIndex];
-
-            // Use separate fields for personal contacts
-            const prenomInput = document.getElementById('edit-person-prenom');
-            if (prenomInput && document.getElementById('edit-person-prenom-group').style.display !== 'none') {
-                p.prenom = prenomInput.value.trim();
-                p.name = name.trim();
-            } else {
-                // Fallback: split full name
-                const inputFullName = name.trim();
-                const lastSpace = inputFullName.lastIndexOf(' ');
-                if (lastSpace > 0) {
-                    p.prenom = inputFullName.substring(0, lastSpace);
-                    p.name = inputFullName.substring(lastSpace + 1);
-                } else {
-                    p.prenom = '';
-                    p.name = inputFullName;
-                }
-            }
-
-            p.function = personFunction;
-            p.wiki = wiki;
-            p.linkedin = linkedin;
-            p.photo = photo;
-            if (interests !== null) p.interests = interests;
-
-            localStorage.setItem('personalData', JSON.stringify(personalData));
-            personFound = true;
-
-            renderPersonalList();
-            closePersonEditModal();
-            alert('✅ Contact mis à jour !');
-            return;
-        }
-    }
-
     if (personFound) {
-        saveData(); // Sauvegarder les autres données si besoin (mais personalData est déjà sauvé)
+        saveData();
         closePersonEditModal();
 
-        // Recharger la vue actuelle
         // Recharger la vue actuelle en fonction de ce qui est affiché
         if (document.getElementById('marseille-view').style.display === 'block') {
             showMarseilleFiche();
@@ -2291,10 +2198,7 @@ function savePersonEdit() {
             showRegionFiche();
         } else if (document.getElementById('fiche-view').style.display === 'block' && currentDept) {
             showFiche(currentDept);
-        } else if (document.getElementById('personal-view').style.display === 'block') {
-            renderPersonalList();
         } else {
-            // Fallback (par exemple si on était sur le dashboard, ce qui ne devrait pas arriver lors d'une édition)
             showRegionFiche();
         }
 
@@ -2305,157 +2209,8 @@ function savePersonEdit() {
 }
 
 
-// --- Personal View Functions ---
-
-function showPersonalView() {
-    currentDept = null;
-    document.getElementById('dashboard').style.display = 'none';
-    document.getElementById('fiche-view').style.display = 'none';
-    document.getElementById('region-view').style.display = 'none';
-    document.getElementById('marseille-view').style.display = 'none';
-
-    document.getElementById('personal-view').style.display = 'block';
-
-    renderPersonalList();
-}
-
-function addPersonalContact() {
-    const prenom = document.getElementById('personal-firstname').value.trim();
-    const nom = document.getElementById('personal-lastname').value.trim();
-    const role = document.getElementById('personal-role').value.trim();
-
-    if (!nom || !role) {
-        alert('Nom et Fonction sont obligatoires.');
-        return;
-    }
-
-    const newPerson = {
-        id: Date.now(),
-        prenom,
-        name: nom,
-        function: role,
-        photo: '',
-        wiki: '',
-        linkedin: ''
-    };
-
-    personalData.push(newPerson);
-    localStorage.setItem('personalData', JSON.stringify(personalData));
-
-    // Reset form
-    document.getElementById('personal-firstname').value = '';
-    document.getElementById('personal-lastname').value = '';
-    document.getElementById('personal-role').value = '';
-
-    renderPersonalList();
-}
-
-function renderPersonalList() {
-    const container = document.getElementById('personal-list-container');
-    if (!container) return;
-    container.innerHTML = '';
-
-    if (personalData.length === 0) {
-        container.innerHTML = `<p style="text-align: center; color: var(--text-dim); font-style: italic;">Aucun contact pour le moment.</p>`;
-        return;
-    }
-
-    // "Clear all" button
-    const headerDiv = document.createElement('div');
-    headerDiv.style.textAlign = 'right';
-    headerDiv.style.marginBottom = '1rem';
-    headerDiv.innerHTML = `<button onclick="if(confirm('Tout supprimer ?')) { personalData=[]; localStorage.setItem('personalData', '[]'); renderPersonalList(); }" style="color:#ff6b6b; border:1px solid #ff6b6b; background:none; padding:0.4rem 0.8rem; border-radius:6px; cursor:pointer; font-size:0.8rem;">⚠️ Vider ma liste</button>`;
-    container.appendChild(headerDiv);
-
-    // Build table
-    const table = document.createElement('table');
-    table.className = 'personal-contacts-table';
-    table.innerHTML = `
-        <thead>
-            <tr>
-                <th>Nom</th>
-                <th>Prénom</th>
-                <th>Fonction</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody></tbody>
-    `;
-
-    const tbody = table.querySelector('tbody');
-
-    personalData.forEach(p => {
-        const fullname = `${p.prenom ? p.prenom + ' ' : ''}${p.name}`;
-        const escapedName = fullname.replace(/'/g, "\\'");
-        const escapedFunc = p.function ? p.function.replace(/'/g, "\\'") : '';
-        const wikiUrl = p.wiki || '';
-        const linkedinSearch = `https://www.linkedin.com/search/results/all/?keywords=${encodeURIComponent(fullname)}`;
-
-        const interestsText = (p.interests || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
-
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-            <td class="col-name"><strong>${p.name || ''}</strong></td>
-            <td class="col-prenom">${p.prenom || ''}</td>
-            <td class="col-function">${p.function || ''}</td>
-            <td class="col-actions">
-                <div class="person-actions">
-                    <button class="person-action-icon info-icon" title="Centre d'intérêts" onclick="event.stopPropagation(); showInterestsPopover('${escapedName}', '${interestsText}', this)">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-                    </button>
-                    <a href="${wikiUrl}" target="_blank" rel="noopener" class="person-action-icon ${!wikiUrl ? 'disabled' : ''}" title="Wikipedia" onclick="event.stopPropagation(); ${!wikiUrl ? 'event.preventDefault();' : ''}">
-                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.09 13.119c-.936 1.932-2.217 4.548-2.853 5.728-.616 1.074-1.127.931-1.532.029-1.406-3.321-4.293-9.144-5.651-12.409-.251-.601-.441-.987-.619-1.139-.181-.15-.554-.24-1.122-.271C.103 5.033 0 4.982 0 4.898v-.455l.052-.045c.924-.005 5.401 0 5.401 0l.051.045v.434c0 .119-.075.176-.225.176l-.564.031c-.485.029-.727.164-.727.436 0 .135.053.33.166.601 1.082 2.646 4.818 10.521 4.818 10.521l2.681-5.476-2.007-4.218c-.253-.543-.489-.993-.71-1.1-.213-.109-.553-.17-1.024-.184-.127-.003-.19-.06-.19-.17v-.46l.048-.044h4.657l.05.044v.434c0 .119-.074.176-.222.176l-.387.02c-.485.029-.749.17-.749.436 0 .135.063.33.174.601l1.807 3.887 1.81-3.674c.112-.27.174-.47.174-.601 0-.266-.238-.407-.714-.436l-.519-.02c-.149 0-.224-.057-.224-.176v-.434l.052-.044h4.024l.052.044v.46c0 .11-.062.167-.189.17-.416.014-.754.075-.972.184-.215.107-.478.557-.726 1.1l-2.205 4.436 2.695 5.502 4.593-10.595c.117-.27.172-.466.172-.601 0-.266-.22-.407-.68-.436l-.637-.02c-.15 0-.224-.057-.224-.176v-.434l.052-.044h4.04l.05.044v.46c0 .11-.063.167-.189.17-.492.014-.862.109-1.107.283-.246.174-.479.555-.701 1.139L13.878 19.05c-.395.846-.891.846-1.287 0l-2.876-5.93h-.001l2.376.001z"/></svg>
-                    </a>
-                    <a href="${linkedinSearch}" target="_blank" rel="noopener" class="person-action-icon" title="LinkedIn" onclick="event.stopPropagation();">
-                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
-                    </a>
-                    <button class="person-action-icon" title="Modifier" onclick="event.stopPropagation(); editPersonComplete('${escapedName}', '${escapedFunc}', this)">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                    </button>
-                    <button class="person-action-icon" title="Supprimer" onclick="event.preventDefault(); event.stopPropagation(); removePersonalContact('${p.id}')" style="color: #ff6b6b;">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-                    </button>
-                </div>
-            </td>
-        `;
-        tbody.appendChild(tr);
-    });
-
-    container.appendChild(table);
-}
-
-function removePersonalContact(idArg) {
-    // Suppression immédiate car popup instable
-
-    // Récupération et nettoyage direct du localStorage
-    let rawData = localStorage.getItem('personalData');
-    if (!rawData) rawData = '[]';
-
-    try {
-        let list = JSON.parse(rawData);
-        const originalLength = list.length;
-
-        // Filtrage robuste (comparaison souple pour string/number)
-        let newList = list.filter(p => p.id != idArg);
-
-        if (list.length === newList.length) {
-            alert("Erreur technique : Ce contact semble déjà supprimé ou introuvable (ID: " + idArg + ")");
-        } else {
-            localStorage.setItem('personalData', JSON.stringify(newList));
-            // Mise à jour de la variable globale au passage
-            if (typeof personalData !== 'undefined') personalData = newList;
-
-            // Mise à jour visuelle immédiate
-            renderPersonalList();
-        }
-    } catch (e) {
-        alert("Erreur lors de la suppression : " + e.message);
-    }
-}
-
-async function autoFillMissingInfo(personName, personId = null) {
+async function autoFillMissingInfo(personName) {
     let statusDiv = document.getElementById('photo-search-status');
-    // Si statusDiv existe (modal ouvert), on l'utilise. Sinon on log
 
     if (statusDiv) {
         statusDiv.textContent = '⏳ Recherche Wiki & Photo...';
@@ -2495,25 +2250,6 @@ async function autoFillMissingInfo(personName, personId = null) {
                 console.log('No photo found on Wiki page.');
             }
 
-            // Mise à jour objet si ID fourni
-            if (personId) {
-                const p = personalData.find(x => x.id === personId);
-                if (p) {
-                    // Mise à jour intelligente Prénom / Nom
-                    const lastSpaceIndex = wikiTitle.lastIndexOf(' ');
-                    if (lastSpaceIndex > 0) {
-                        p.prenom = wikiTitle.substring(0, lastSpaceIndex);
-                        p.name = wikiTitle.substring(lastSpaceIndex + 1);
-                    } else {
-                        p.prenom = '';
-                        p.name = wikiTitle;
-                    }
-
-                    p.wiki = wikiUrl;
-                    if (photoUrl) p.photo = photoUrl;
-                }
-            }
-
             if (statusDiv) {
                 statusDiv.innerHTML = photoUrl ? '✅ Infos trouvées !' : '⚠️ Wiki trouvé sans photo.';
                 statusDiv.className = photoUrl ? 'photo-search-status success' : 'photo-search-status warning';
@@ -2535,29 +2271,6 @@ async function autoFillMissingInfo(personName, personId = null) {
         }
         return false;
     }
-}
-
-async function autoCompleteAll() {
-    const btn = document.getElementById('auto-complete-all-btn');
-    if (btn) btn.disabled = true; btn.textContent = '⏳ En cours...';
-
-    let count = 0;
-    for (const p of personalData) {
-        // On ne cherche que si incomplet
-        if (!p.wiki || !p.photo) {
-            const fullname = `${p.prenom ? p.prenom + ' ' : ''}${p.name}`;
-            await autoFillMissingInfo(fullname, p.id);
-            count++;
-            // Pause pour éviter rate limit
-            await new Promise(r => setTimeout(r, 500));
-        }
-    }
-
-    localStorage.setItem('personalData', JSON.stringify(personalData));
-    renderPersonalList();
-
-    if (btn) btn.disabled = false; btn.textContent = '⚡ Tout Actualiser';
-    alert(`Mise à jour terminée !`);
 }
 
 
@@ -2742,18 +2455,7 @@ window.refreshVilleData = refreshVilleData;
 window.showInterestsPopover = showInterestsPopover;
 window.toggleInterestsEdit = toggleInterestsEdit;
 
-// Events Personal
-const personalBtn = document.getElementById('personal-search-btn');
-if (personalBtn) personalBtn.onclick = showPersonalView;
 
-const addPersonalBtn = document.getElementById('add-personal-btn');
-if (addPersonalBtn) addPersonalBtn.onclick = addPersonalContact;
-
-const backPersonalBtn = document.getElementById('back-personal-btn');
-if (backPersonalBtn) backPersonalBtn.onclick = backToDashboard;
-
-const autoCompleteBtn = document.getElementById('auto-complete-all-btn');
-if (autoCompleteBtn) autoCompleteBtn.onclick = autoCompleteAll;
 
 // ── Burger Menu / Side Drawer ──────────────────────────────
 (function initDrawer() {
@@ -2795,7 +2497,7 @@ if (autoCompleteBtn) autoCompleteBtn.onclick = autoCompleteAll;
     };
 
     wire('drawer-refresh-btn', refreshData);
-    wire('drawer-personal-btn', showPersonalView);
+
     wire('drawer-region-btn', showRegionFiche);
     wire('drawer-marseille-btn', showMarseilleFiche);
     wire('drawer-logout-btn', () => {
